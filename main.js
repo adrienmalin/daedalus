@@ -82,6 +82,7 @@ const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.inner
 camera.rotation.order = 'YXZ';
 
 const worldOctree = new Octree();
+const raftOctree = new Octree();
 
 const container = document.getElementById( 'container' );
 
@@ -109,7 +110,7 @@ const water = new Water(
     }
 );
 water.rotation.x = - Math.PI / 2;
-water.position.y = -.6
+water.position.y = -.01
 scene.add( water );
 
 // Ground
@@ -131,7 +132,7 @@ const groundMaterial = new THREE.MeshPhongMaterial( {
 } )
 const ground = new THREE.Mesh( groundGeometry, groundMaterial )
 ground.rotation.x = - Math.PI / 2;
-ground.position.set(mazeLength/2, -.5, mazeWidth/2)
+ground.position.set(mazeLength/2, 0, mazeWidth/2)
 ground.receiveShadow = true;
 ground.matrixAutoUpdate = false
 ground.updateMatrix();
@@ -140,25 +141,28 @@ worldOctree.fromGraphNode( ground )
 
 // Raft
 
-const raftGeometry = new THREE.BoxGeometry( 1.8, .1, .9 )
+const raftGeometry = new THREE.BoxGeometry( 1.8, .1, .9, 1, 1, 8 )
 const raftMaterial = new THREE.MeshPhongMaterial( {
-    map       : woodTexture,
-    color     : 0xFFFFFF,
-    emissive  : 0,
-    specular  : 0x505050,
-    shininess : 1,
-    bumpMap   : woodTexture,
-    bumpScale : .1,
-    depthFunc : 3,
-    depthTest : true,
-    depthWrite: true
+    map              : woodTexture,
+    color            : 0xFFFFFF,
+    emissive         : 0,
+    specular         : 0x505050,
+    shininess        : 1,
+    bumpMap          : woodTexture,
+    bumpScale        : .1,
+    depthFunc        : 3,
+    depthTest        : true,
+    depthWrite       : true,
+    displacementMap  : woodTexture,
+    displacementScale: -0.08
 } )
 const raft = new THREE.Mesh( raftGeometry, raftMaterial )
-raft.position.set( mazeLength/2 + .2, -.6, -1 )
+raft.position.set( mazeLength/2 + .2, 0, -1 )
 raft.rotation.y = 1.4
 raft.rotation.order = 'ZXY';
 scene.add(raft)
 worldOctree.fromGraphNode( raft )
+raftOctree.fromGraphNode( raft )
 
 // Maze
 
@@ -184,10 +188,10 @@ const cube = new THREE.Mesh(wallGeometry)
 mazeMap.forEach((row, z) => {
     row.forEach((isWall, x) => {
         if (isWall) {
-            matrix.setPosition(x + .5, 0, z + .5)
+            matrix.setPosition(x + .5, 0.5, z + .5)
             maze.setMatrixAt( i, matrix );
             const clone = cube.clone()
-            clone.position.set(x + .5, 0, z + .5)
+            clone.position.set(x + .5, 0.5, z + .5)
             worldOctree.fromGraphNode( clone )
             i++
         }
@@ -299,22 +303,18 @@ const STEPS_PER_FRAME = 5;
 
 const playerCollider = new Capsule(
     new THREE.Vector3( mazeLength/2, 0.3, mazeWidth/2 ),
-    new THREE.Vector3( mazeLength/2, 0.3, mazeWidth/2 ),
+    new THREE.Vector3( mazeLength/2, 0.7, mazeWidth/2 ),
     0.3
 );
 
-const playerVelocity = new THREE.Vector3();
+const playerVelocity  = new THREE.Vector3();
 const playerDirection = new THREE.Vector3();
 
 let playerOnFloor = false;
-let mouseTime = 0;
+let jumping       = false;
+let escaped       = false;
 
 const keyStates = {};
-let jumping     = false;
-
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
 
 document.addEventListener( 'keydown', ( event ) => {
 
@@ -332,8 +332,6 @@ document.addEventListener( 'keyup', ( event ) => {
 container.addEventListener( 'mousedown', () => {
 
     document.body.requestPointerLock();
-
-    mouseTime = performance.now();
 
 } );
 
@@ -360,6 +358,13 @@ function onWindowResize() {
 }
 
 function playerCollisions() {
+
+    if ( !escaped && raftOctree.capsuleIntersect( playerCollider ) ) {
+
+        escaped = true;
+        alert("Congrats! You escaped.");
+
+    }
 
     const result = worldOctree.capsuleIntersect( playerCollider );
 
@@ -488,9 +493,9 @@ function teleportPlayerIfOob() {
 
     if ( camera.position.y <= - 25 ) {
 
-        playerCollider.start.set( mazeLength/2, 0.2, mazeWidth/2 );
-        playerCollider.end.set( mazeLength/2, 0.3, mazeWidth/2 );
-        playerCollider.radius = 0.2;
+        playerCollider.start.set( mazeLength/2, 0.3, mazeWidth/2 );
+        playerCollider.end.set( mazeLength/2, 0.7, mazeWidth/2 );
+        playerCollider.radius = 0.3;
         camera.position.copy( playerCollider.end );
         camera.rotation.set( 0, 0, 0 );
 
@@ -500,8 +505,6 @@ function teleportPlayerIfOob() {
 
 
 function animate() {
-
-    requestAnimationFrame( animate );
 
     const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
 
@@ -523,10 +526,12 @@ function animate() {
     water.material.uniforms[ 'time' ].value += 1.0 / 100.0;
     raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
     raft.rotation.x = 0.06 * Math.cos( time )
-    raft.position.y = -0.59 + 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
+    raft.position.y = 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
 
     renderer.render( scene, camera );
 
     stats.update();
+
+    requestAnimationFrame( animate );
 
 }
