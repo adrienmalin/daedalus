@@ -218,15 +218,14 @@ scene.add( ambientLight );
 const sunLight = new THREE.DirectionalLight( 0xffffff, 0.3 );
 sunLight.castShadow = true;
 sunLight.shadow.camera.near = 0.1;
-sunLight.shadow.camera.far = 500;
+sunLight.shadow.camera.far = 50;
 sunLight.shadow.camera.right = 30;
 sunLight.shadow.camera.left = - 30;
 sunLight.shadow.camera.top	= 30;
 sunLight.shadow.camera.bottom = - 30;
 sunLight.shadow.mapSize.width = 4096;
 sunLight.shadow.mapSize.height = 4096;
-sunLight.shadow.radius = 4;
-//sunLight.shadow.bias = -0.00008;
+sunLight.shadow.radius = 5;
 sunLight.target = ground
 scene.add( sunLight );
 
@@ -267,9 +266,9 @@ const parameters = {
 const pmremGenerator = new THREE.PMREMGenerator( renderer );
 let renderTarget;
 
-const now         = new Date("05/29/2023 17:00:00 GMT+3")
-const startOfYear = new Date(now.getFullYear(), 0, 0);
-const diff        = now - startOfYear;
+const today       = new Date()
+const startOfYear = new Date(today.getFullYear(), 0, 0);
+const diff        = today - startOfYear;
 const oneDay      = 1000 * 60 * 60 * 24;
 const dayOfYear   = Math.floor(diff / oneDay);
 const declination = 0.40928 * Math.sin(2*Math.PI*(dayOfYear+284)/365)
@@ -280,15 +279,15 @@ function updateSun() {
     if ( showGUI ) {
     
         elevation = THREE.MathUtils.degToRad( parameters.elevation );
-        azimuth = THREE.MathUtils.degToRad( parameters.azimuth );
+        azimuth   = THREE.MathUtils.degToRad( parameters.azimuth );
 
     } else {
 
-        const time = performance.now() * 0.001;
-        const hour = (14 + time / 5760) % 24
+        const time      = performance.now() ;
+        const hour      = ( 8 + time / 1440000 ) % 24
         const hourAngle = Math.PI * (1-hour/12)
-        elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
-        azimuth = Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
+              elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
+              azimuth   = Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
     
     }
 
@@ -303,7 +302,7 @@ function updateSun() {
     if ( elevation >= 0 ) {
 
         sunLight.visible = true
-        sunLight.position.setFromSphericalCoords(100, phi, theta)
+        sunLight.position.setFromSphericalCoords(10, phi, theta)
         sunLight.position.x += mazeLength/2
         sunLight.position.z += mazeWidth/2
 
@@ -325,22 +324,31 @@ function updateSun() {
 }
 
 updateSun();
-setInterval( updateSun, 1000 );
+setInterval( updateSun, 100 );
 
 // showGUI
 
-let stats, helper, gui
+let stats, octreeHelper, gui
 if ( showGUI ) {
 
-    helper = new OctreeHelper( worldOctree );
-    helper.visible = false;
-    scene.add( helper );
-
     gui = new GUI( { width: 200 } );
-    const showHelper = gui.add( { octree: false }, "octree" )
+
+    octreeHelper = new OctreeHelper( worldOctree );
+    octreeHelper.visible = false;
+    scene.add( octreeHelper );
+    const lightHelper = new THREE.DirectionalLightHelper( sunLight, .5 )
+    lightHelper.position.copy(mazeMap.start)
+    lightHelper.visible = false;
+    scene.add( lightHelper );
+    var cameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
+    cameraHelper.visible = false;
+    scene.add(cameraHelper)
+    const showHelper = gui.add( { helpers: false }, "helpers" )
     showHelper.onChange( function ( value ) {
 
-        helper.visible = value;
+        octreeHelper.visible = value;
+        lightHelper.visible  = value;
+        cameraHelper.visible = value;
 
     } );
 
@@ -588,13 +596,6 @@ function animate() {
     raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
     raft.rotation.x = 0.06 * Math.cos( time )
     raft.position.y = 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
-
-    if ( sunLight.visible ) {
-
-        sunLight.position.copy(sun)
-        sunLight.position.add(camera)
-
-    }
 
     if ( torchLight.visible ) {
     
