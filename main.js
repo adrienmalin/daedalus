@@ -67,8 +67,8 @@ const longitude = THREE.MathUtils.degToRad(25)
 const mazeLength = 51
 const mazeWidth = 51
 
-let showGUI = window.location.hash.includes("debug")
-let showStats = window.location.hash.includes("stats")
+let showGUI = window.location.search.includes("debug")
+let showStats = window.location.search.includes("stats")
 
 const loadMngr      = new THREE.LoadingManager();
 const loader        = new THREE.TextureLoader(loadMngr);
@@ -311,7 +311,7 @@ function updateSun() {
 
     }  else {
 
-        sunLight.visible = false
+        sunLight.visible   = false
         torchLight.visible = true
 
     }
