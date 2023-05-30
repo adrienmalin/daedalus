@@ -434,7 +434,7 @@ function getSideVector() {
 function controls( deltaTime ) {
 
     // gives a bit of air control
-    const speedDelta = deltaTime * ( playerOnFloor ? 25 : 8 );
+    const speedDelta = deltaTime * ( playerOnFloor ? 10 : 2 );
 
     if ( keyStates["ArrowUp"] || keyStates[ 'KeyW' ] ) {
 
