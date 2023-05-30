@@ -3,11 +3,11 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 
 import { Octree } from 'three/addons/math/Octree.js';
-// import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
+import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
 
 import { Capsule } from 'three/addons/math/Capsule.js';
 
-// import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 import { Water } from 'three/addons/objects/Water.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -66,6 +66,9 @@ const latitude  = THREE.MathUtils.degToRad(35)
 const longitude = THREE.MathUtils.degToRad(25)
 const mazeLength = 51
 const mazeWidth = 51
+
+let showGUI = window.location.hash.includes("debug")
+let showStats = window.location.hash.includes("stats")
 
 const loadMngr      = new THREE.LoadingManager();
 const loader        = new THREE.TextureLoader(loadMngr);
@@ -212,9 +215,6 @@ camera.position.copy(mazeMap.start)
 const ambientLight = new THREE.AmbientLight( 0x404040 , 1 ); // soft white light
 scene.add( ambientLight );
 
-const torchLight = new THREE.SpotLight(0xffffe8, 1, mazeLength/2, .45, 1)
-scene.add( torchLight.target );
-
 const sunLight = new THREE.DirectionalLight( 0xffffff, 0.3 );
 sunLight.castShadow = true;
 sunLight.shadow.camera.near = 0.1;
@@ -229,6 +229,20 @@ sunLight.shadow.radius = 4;
 //sunLight.shadow.bias = -0.00008;
 sunLight.target = ground
 scene.add( sunLight );
+
+const torchLight = new THREE.SpotLight(0xffffe8, 1, mazeLength/2, .45, 1)
+torchLight.castShadow = true;
+torchLight.shadow.camera.near = 0.1;
+torchLight.shadow.camera.far = 500;
+torchLight.shadow.camera.right = 30;
+torchLight.shadow.camera.left = - 30;
+torchLight.shadow.camera.top	= 30;
+torchLight.shadow.camera.bottom = - 30;
+torchLight.shadow.mapSize.width = 4096;
+torchLight.shadow.mapSize.height = 4096;
+torchLight.shadow.radius = 4;
+scene.add( torchLight );
+scene.add( torchLight.target );
 
 // Skybox
 
@@ -258,16 +272,25 @@ const startOfYear = new Date(now.getFullYear(), 0, 0);
 const diff        = now - startOfYear;
 const oneDay      = 1000 * 60 * 60 * 24;
 const dayOfYear   = Math.floor(diff / oneDay);
+const declination = 0.40928 * Math.sin(2*Math.PI*(dayOfYear+284)/365)
 
 function updateSun() {
+    
+    let elevation, azimuth
+    if ( showGUI ) {
+    
+        elevation = THREE.MathUtils.degToRad( parameters.elevation );
+        azimuth = THREE.MathUtils.degToRad( parameters.azimuth );
 
-    const time = performance.now() * 0.001;
-    const hour = (14 + time / 5760) % 24
+    } else {
 
-    const declination = 0.40928 * Math.sin(2*Math.PI*(dayOfYear+284)/365)
-    const hourAngle = Math.PI * (1-hour/12)
-    const elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
-    const azimuth = Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
+        const time = performance.now() * 0.001;
+        const hour = (14 + time / 5760) % 24
+        const hourAngle = Math.PI * (1-hour/12)
+        elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
+        azimuth = Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
+    
+    }
 
     const phi = Math.PI/2 - elevation
     const theta = azimuth
@@ -277,32 +300,74 @@ function updateSun() {
     sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
     water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
 
+    if ( elevation >= 0 ) {
+
+        sunLight.visible = true
+        sunLight.position.setFromSphericalCoords(100, phi, theta)
+        sunLight.position.x += mazeLength/2
+        sunLight.position.z += mazeWidth/2
+
+        torchLight.visible = false
+
+    }  else {
+
+        sunLight.visible = false
+        torchLight.visible = true
+
+    }
+
     if ( renderTarget !== undefined ) renderTarget.dispose();
 
     renderTarget = pmremGenerator.fromScene( sky );
 
     scene.environment = renderTarget.texture;
-    
-    sunLight.position.setFromSphericalCoords(100, phi, theta)
-    sunLight.position.x += mazeLength/2
-    sunLight.position.z += mazeWidth/2
 
 }
 
 updateSun();
-setInterval( updateSun, 10000 );
+setInterval( updateSun, 1000 );
 
-let showStats = false
-const stats = new Stats();
-window.onhashchange = function(event) {
-    showStats = document.location.hash == "#stats"
-    if ( showStats ) {
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '0px';
-        container.appendChild( stats.domElement );
-    }
+// showGUI
+
+let stats, helper, gui
+if ( showGUI ) {
+
+    helper = new OctreeHelper( worldOctree );
+    helper.visible = false;
+    scene.add( helper );
+
+    gui = new GUI( { width: 200 } );
+    const showHelper = gui.add( { octree: false }, "octree" )
+    showHelper.onChange( function ( value ) {
+
+        helper.visible = value;
+
+    } );
+
+    const folderSky = gui.addFolder( 'Sky' );
+    folderSky.add( parameters, 'elevation', -90, 90, 0.1 ).onChange( updateSun );
+    folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+    folderSky.open();
+
+    const waterUniforms = water.material.uniforms;
+
+    const folderWater = gui.addFolder( 'Water' );
+    folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
+    folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
+    folderWater.open();
+
 }
-window.onhashchange()
+
+if ( showStats ) {
+
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    container.appendChild( stats.domElement );
+
+}
+
+// Controls
 
 const GRAVITY = 30;
 
@@ -483,20 +548,6 @@ function controls( deltaTime ) {
 
 }
 
-/*
-const helper = new OctreeHelper( worldOctree );
-helper.visible = false;
-scene.add( helper );
-
-const gui = new GUI( { width: 200 } );
-gui.add( { debug: false }, 'debug' )
-    .onChange( function ( value ) {
-
-        helper.visible = value;
-
-    } );
-*/
-
 function teleportPlayerIfOob() {
 
     if ( camera.position.y <= - 25 ) {
@@ -506,6 +557,8 @@ function teleportPlayerIfOob() {
         playerCollider.radius = 0.3;
         camera.position.copy( playerCollider.end );
         camera.rotation.set( 0, 0, 0 );
+
+        escaped = false;
 
     }
 
@@ -535,6 +588,22 @@ function animate() {
     raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
     raft.rotation.x = 0.06 * Math.cos( time )
     raft.position.y = 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
+
+    if ( sunLight.visible ) {
+
+        sunLight.position.copy(sun)
+        sunLight.position.add(camera)
+
+    }
+
+    if ( torchLight.visible ) {
+    
+        torchLight.position.copy(camera.position)
+        torchLight.position.y -= .2
+        const targetDirection = camera.getWorldDirection(camera.up).add(camera.position)
+        torchLight.target.position.copy(targetDirection)
+    
+    }
 
     renderer.render( scene, camera );
 
