@@ -73,6 +73,9 @@ const waterTexture  = loader.load('img/waternormals.jpg');
 const groundTexture = loader.load('img/ground.jpg');
 const wallTexture   = loader.load('img/wall.jpg');
 const woodTexture   = loader.load('img/wood.jpg');
+loadMngr.onLoad = () => {
+    animate();
+};
 
 const clock = new THREE.Clock();
 
@@ -182,9 +185,9 @@ const wallMaterial = new THREE.MeshPhongMaterial( {
 
 const mazeMap = new Labyrinthe(mazeLength, mazeWidth)
 const maze = new THREE.InstancedMesh( wallGeometry, wallMaterial, mazeMap.walls );
-let i=0
 let matrix = new THREE.Matrix4()
 const cube = new THREE.Mesh(wallGeometry)
+let i=0
 mazeMap.forEach((row, z) => {
     row.forEach((isWall, x) => {
         if (isWall) {
@@ -289,10 +292,17 @@ function updateSun() {
 updateSun();
 setInterval( updateSun, 10000 );
 
+let showStats = false
 const stats = new Stats();
-stats.domElement.style.position = 'absolute';
-stats.domElement.style.top = '0px';
-container.appendChild( stats.domElement );
+window.onhashchange = function(event) {
+    showStats = document.location.hash == "#stats"
+    if ( showStats ) {
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        container.appendChild( stats.domElement );
+    }
+}
+window.onhashchange()
 
 const GRAVITY = 30;
 
@@ -487,8 +497,6 @@ gui.add( { debug: false }, 'debug' )
     } );
 */
 
-animate();
-
 function teleportPlayerIfOob() {
 
     if ( camera.position.y <= - 25 ) {
@@ -530,7 +538,7 @@ function animate() {
 
     renderer.render( scene, camera );
 
-    stats.update();
+    if ( showStats ) stats.update();
 
     requestAnimationFrame( animate );
 
