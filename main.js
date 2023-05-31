@@ -70,6 +70,9 @@ const mazeWidth = 51
 let showGUI = window.location.search.includes("debug")
 let showStats = window.location.search.includes("stats")
 
+const ambiance      = new Audio("ambiance.mp3")
+ambiance.loop       = true
+
 const loadMngr      = new THREE.LoadingManager();
 const loader        = new THREE.TextureLoader(loadMngr);
 const waterTexture  = loader.load('img/waternormals.jpg');
@@ -117,6 +120,7 @@ const water = new Water(
 );
 water.rotation.x = - Math.PI / 2;
 water.position.y = -.01
+water.receiveShadow = true;
 scene.add( water );
 
 // Ground
@@ -164,8 +168,9 @@ const raftMaterial = new THREE.MeshPhongMaterial( {
 } )
 const raft = new THREE.Mesh( raftGeometry, raftMaterial )
 raft.position.set( mazeLength/2 + .2, 0, -1 )
-raft.rotation.y = 1.4
+raft.rotation.y     = 1.4
 raft.rotation.order = 'ZXY';
+raft.castShadow     = true;
 scene.add(raft)
 worldOctree.fromGraphNode( raft )
 raftOctree.fromGraphNode( raft )
@@ -415,6 +420,7 @@ document.addEventListener( 'keyup', ( event ) => {
 container.addEventListener( 'mousedown', () => {
 
     document.body.requestPointerLock();
+    ambiance.play()
 
 } );
 
