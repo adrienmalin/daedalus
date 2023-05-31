@@ -283,8 +283,8 @@ function updateSun() {
 
     } else {
 
-        const time      = performance.now() ;
-        const hour      = ( 8 + time / 1440000 ) % 24
+        const time      = clock.elapsedTime ;
+        const hour      = ( 8 + time / 1440 ) % 24
         const hourAngle = Math.PI * (1-hour/12)
               elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
               azimuth   = Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
@@ -590,7 +590,7 @@ function animate() {
 
     }
 
-    const time = performance.now() * 0.001;
+    const time = clock.elapsedTime;
 
     water.material.uniforms[ 'time' ].value += 1.0 / 100.0;
     raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
