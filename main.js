@@ -218,7 +218,7 @@ scene.add( ambientLight );
 const sunLight = new THREE.DirectionalLight( 0xffffff, 0.3 );
 sunLight.castShadow = true;
 sunLight.shadow.camera.near = 0.1;
-sunLight.shadow.camera.far = 50;
+sunLight.shadow.camera.far = 500;
 sunLight.shadow.camera.right = 30;
 sunLight.shadow.camera.left = - 30;
 sunLight.shadow.camera.top	= 30;
@@ -302,7 +302,7 @@ function updateSun() {
     if ( elevation >= 0 ) {
 
         sunLight.visible = true
-        sunLight.position.setFromSphericalCoords(10, phi, theta)
+        sunLight.position.setFromSphericalCoords(100, phi, theta)
         sunLight.position.x += mazeLength/2
         sunLight.position.z += mazeWidth/2
 
@@ -445,7 +445,7 @@ function playerCollisions() {
     if ( !escaped && raftOctree.capsuleIntersect( playerCollider ) ) {
 
         escaped = true;
-        alert("Congrats! You escaped.");
+        alert("Congrats! You finally escaped.");
 
     }
 
