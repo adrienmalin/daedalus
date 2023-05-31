@@ -414,9 +414,18 @@ document.addEventListener( 'keyup', ( event ) => {
 container.addEventListener( 'mousedown', () => {
 
     document.body.requestPointerLock();
-    ambiance.play()
 
 } );
+
+function lockChangeAlert() {
+  if (document.pointerLockElement === document.body) {
+    ambiance.play()
+  } else {
+    ambiance.pause()
+  }
+}
+
+document.addEventListener("pointerlockchange", lockChangeAlert, false);
 
 document.body.addEventListener( 'mousemove', ( event ) => {
 
