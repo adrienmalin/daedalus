@@ -99,7 +99,7 @@ const renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap  ;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 container.appendChild( renderer.domElement );
 
@@ -129,16 +129,16 @@ const groundGeometry = new THREE.PlaneGeometry(mazeLength, mazeWidth)
 groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping
 groundTexture.repeat.set(50, 50)
 const groundMaterial = new THREE.MeshPhongMaterial( {
-    map              : groundTexture,
-    color            : 0xFFFFFF,
-    emissive         : 0,
-    specular         : 0x000000,
-    shininess        : 5,
-    bumpMap          : groundTexture,
-    bumpScale        : .02,
-    depthFunc        : 3,
-    depthTest        : true,
-    depthWrite       : true
+    map       : groundTexture,
+    color     : 0xFFFFFF,
+    emissive  : 0,
+    specular  : 0x000000,
+    shininess : 5,
+    bumpMap   : groundTexture,
+    bumpScale : .02,
+    depthFunc : 3,
+    depthTest : true,
+    depthWrite: true
 } )
 const ground = new THREE.Mesh( groundGeometry, groundMaterial )
 ground.rotation.x = - Math.PI / 2;
@@ -221,30 +221,28 @@ const ambientLight = new THREE.AmbientLight( 0x404040 , 1 ); // soft white light
 scene.add( ambientLight );
 
 const sunLight = new THREE.DirectionalLight( 0xffffff, 0.3 );
-sunLight.castShadow = true;
-sunLight.shadow.camera.near = 0.1;
-sunLight.shadow.camera.far = 500;
-sunLight.shadow.camera.right = 30;
-sunLight.shadow.camera.left = - 30;
-sunLight.shadow.camera.top	= 30;
-sunLight.shadow.camera.bottom = - 30;
-sunLight.shadow.mapSize.width = 4096;
+sunLight.castShadow            = true;
+sunLight.shadow.camera.near    = 20;
+sunLight.shadow.camera.far     = 200;
+sunLight.shadow.camera.right   = 10;
+sunLight.shadow.camera.left    = -10;
+sunLight.shadow.camera.top     = 10;
+sunLight.shadow.camera.bottom  = -10;
+sunLight.shadow.mapSize.width  = 4096;
 sunLight.shadow.mapSize.height = 4096;
-sunLight.shadow.radius = 5;
-sunLight.target = ground
+sunLight.target                = camera
 scene.add( sunLight );
 
 const torchLight = new THREE.SpotLight(0xffffe8, 1, mazeLength/2, .45, 1)
-torchLight.castShadow = true;
-torchLight.shadow.camera.near = 0.1;
-torchLight.shadow.camera.far = 500;
-torchLight.shadow.camera.right = 30;
-torchLight.shadow.camera.left = - 30;
-torchLight.shadow.camera.top	= 30;
-torchLight.shadow.camera.bottom = - 30;
-torchLight.shadow.mapSize.width = 4096;
-torchLight.shadow.mapSize.height = 4096;
-torchLight.shadow.radius = 4;
+torchLight.castShadow            = true;
+torchLight.shadow.camera.near    = 20;
+torchLight.shadow.camera.far     = 200;
+torchLight.shadow.camera.right   = 30;
+torchLight.shadow.camera.left    = -30;
+torchLight.shadow.camera.top     = 30;
+torchLight.shadow.camera.bottom  = -30;
+torchLight.shadow.mapSize.width  = 512;
+torchLight.shadow.mapSize.height = 512;
 scene.add( torchLight );
 scene.add( torchLight.target );
 
@@ -292,14 +290,14 @@ function updateSun() {
         const hour      = ( 8 + time / 1440 ) % 24
         const hourAngle = Math.PI * (1-hour/12)
               elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
-              azimuth   = Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
+              azimuth   = 0.6 + Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
     
     }
 
     const phi = Math.PI/2 - elevation
     const theta = azimuth
 
-    sun.setFromSphericalCoords( 1, phi, theta );
+    sun.setFromSphericalCoords( 100, phi, theta );
 
     sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
     water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
@@ -307,10 +305,6 @@ function updateSun() {
     if ( elevation >= 0 ) {
 
         sunLight.visible = true
-        sunLight.position.setFromSphericalCoords(100, phi, theta)
-        sunLight.position.x += mazeLength/2
-        sunLight.position.z += mazeWidth/2
-
         torchLight.visible = false
 
     }  else {
@@ -602,6 +596,14 @@ function animate() {
     raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
     raft.rotation.x = 0.06 * Math.cos( time )
     raft.position.y = 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
+
+    if ( sunLight.visible ) {
+    
+        sunLight.position.copy( sun )
+        sunLight.position.x += camera.position.x
+        sunLight.position.z += camera.position.z
+
+    }
 
     if ( torchLight.visible ) {
     
