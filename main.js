@@ -453,8 +453,7 @@ function playerCollisions() {
 
     if ( !escaped && raftOctree.capsuleIntersect( playerCollider ) ) {
 
-        escaped = true;
-        alert("Congrats! You finally escaped.");
+        end.className = "escaped";
 
     }
 
@@ -477,6 +476,12 @@ function playerCollisions() {
     }
 
 }
+
+addEventListener("animationend", (event) => {
+    escaped = true;
+    document.exitPointerLock();
+});
+
 
 function updatePlayer( deltaTime ) {
 
@@ -627,6 +632,6 @@ function animate() {
 
     if ( showStats ) stats.update();
 
-    requestAnimationFrame( animate );
+    if ( !escaped ) requestAnimationFrame( animate );
 
 }
