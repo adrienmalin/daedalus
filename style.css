@@ -9,7 +9,7 @@ body {
   cursor: pointer;
 }
 
-canvas {
+#container {
   position: absolute;
   z-index: 0;
 }
@@ -23,8 +23,12 @@ canvas {
   }
 }
 
-#end {
+#message {
   display: none;
+}
+
+#message.escaped {
+  display: flex;
   position: absolute;
   left: 0;
   width: 100%;
@@ -33,14 +37,11 @@ canvas {
   font-family: Georgia, serif;
   color: gray;
   justify-content: center;
-  z-index: 1;
-}
-
-#end.escaped {
-  display: flex;
   animation: escaped 5s;
   height: 50vh;
   padding-top: 50vh;
   opacity: 100%;
   background: white;
+  cursor: default;
+  z-index: 1;
 }

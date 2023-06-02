@@ -394,7 +394,7 @@ const playerDirection = new THREE.Vector3();
 
 let playerOnFloor = false;
 let jumping       = false;
-let escaped       = false;
+let stopAnimation       = false;
 
 const keyStates = {};
 
@@ -451,9 +451,9 @@ function onWindowResize() {
 
 function playerCollisions() {
 
-    if ( !escaped && raftOctree.capsuleIntersect( playerCollider ) ) {
+    if ( !stopAnimation && raftOctree.capsuleIntersect( playerCollider ) ) {
 
-        end.className = "escaped";
+        message.className = "escaped";
 
     }
 
@@ -478,8 +478,10 @@ function playerCollisions() {
 }
 
 addEventListener("animationend", (event) => {
-    escaped = true;
+
+    stopAnimation = true;
     document.exitPointerLock();
+
 });
 
 
@@ -580,8 +582,6 @@ function teleportPlayerIfOob() {
         camera.position.copy( playerCollider.end );
         camera.rotation.set( 0, 0, 0 );
 
-        escaped = false;
-
     }
 
 }
@@ -632,6 +632,6 @@ function animate() {
 
     if ( showStats ) stats.update();
 
-    if ( !escaped ) requestAnimationFrame( animate );
+    if ( !stopAnimation ) requestAnimationFrame( animate );
 
 }
