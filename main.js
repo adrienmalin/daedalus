@@ -70,8 +70,9 @@ const mazeWidth = 51
 let showGUI = window.location.search.includes("debug")
 let showStats = window.location.search.includes("stats")
 
-const ambiance      = new Audio("ambiance.mp3")
+const ambiance      = new Audio("snd/ambiance.mp3")
 ambiance.loop       = true
+const piano         = new Audio("snd/waves-and-tears.mp3")
 
 const loadMngr      = new THREE.LoadingManager();
 const loader        = new THREE.TextureLoader(loadMngr);
@@ -287,7 +288,7 @@ function updateSun() {
     } else {
 
         const time      = clock.elapsedTime ;
-        const hour      = ( 8 + time / 1440 ) % 24
+        const hour      = ( 14 + time / 1440 ) % 24
         const hourAngle = Math.PI * (1-hour/12)
               elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
               azimuth   = 0.6 + Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
@@ -454,6 +455,7 @@ function playerCollisions() {
     if ( !stopAnimation && raftOctree.capsuleIntersect( playerCollider ) ) {
 
         message.className = "escaped";
+        piano.play();
 
     }
 
