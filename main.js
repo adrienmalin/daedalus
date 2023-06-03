@@ -276,6 +276,7 @@ const diff        = today - startOfYear;
 const oneDay      = 1000 * 60 * 60 * 24;
 const dayOfYear   = Math.floor(diff / oneDay);
 const declination = 0.40928 * Math.sin(2*Math.PI*(dayOfYear+284)/365)
+const startHour   = 24 * Math.random()
 
 function updateSun() {
     
@@ -288,10 +289,10 @@ function updateSun() {
     } else {
 
         const time      = clock.elapsedTime ;
-        const hour      = ( 14 + time / 1440 ) % 24
+        const hour      = ( startHour + time / 1440 ) % 24
         const hourAngle = Math.PI * (1-hour/12)
               elevation = Math.asin( Math.sin(declination)*Math.sin(latitude) + Math.cos(declination)*Math.cos(latitude)*Math.cos(hourAngle) )
-              azimuth   = 0.6 + Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
+              azimuth   = -Math.PI/2 + Math.asin( Math.cos(declination)*Math.sin(hourAngle)/Math.cos(elevation) )
     
     }
 
@@ -324,7 +325,7 @@ function updateSun() {
 }
 
 updateSun();
-setInterval( updateSun, 100 );
+const updateSunIntervalId = setInterval( updateSun, 100 );
 
 // showGUI
 
@@ -482,6 +483,7 @@ function playerCollisions() {
 addEventListener("animationend", (event) => {
 
     stopAnimation = true;
+    clearInterval( updateSunIntervalId );
     document.exitPointerLock();
 
 });
