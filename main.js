@@ -139,12 +139,12 @@ sunLight.shadow.camera.top     =  10;
 sunLight.shadow.camera.bottom  = -10;
 sunLight.shadow.mapSize.width  = 4096;
 sunLight.shadow.mapSize.height = 4096;
-sunLight.shadow.radius         = 4;
+sunLight.shadow.radius         = 6;
 sunLight.target                = camera
 scene.add( sunLight );
 
 const torchLight = new THREE.SpotLight(0xffffe8, 1, mazeLength/2, .45, 1)
-torchLight.castShadow            = true;
+/*torchLight.castShadow            = true;
 torchLight.shadow.camera.near    = 20;
 torchLight.shadow.camera.far     = 200;
 torchLight.shadow.camera.right   = 30;
@@ -152,7 +152,7 @@ torchLight.shadow.camera.left    = -30;
 torchLight.shadow.camera.top     = 30;
 torchLight.shadow.camera.bottom  = -30;
 torchLight.shadow.mapSize.width  = 512;
-torchLight.shadow.mapSize.height = 512;
+torchLight.shadow.mapSize.height = 512;*/
 scene.add( torchLight );
 scene.add( torchLight.target );
 
