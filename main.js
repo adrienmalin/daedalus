@@ -205,6 +205,7 @@ function updateSun() {
 
     sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
     ocean.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+    ambientLight.intensity = 0.5 + Math.max( elevation, 0 )/Math.PI;
 
     if ( elevation >= 0 ) {
 
