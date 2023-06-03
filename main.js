@@ -381,9 +381,6 @@ if ( showStats ) {
 
 const GRAVITY = 30;
 
-const NUM_SPHERES = 100;
-const SPHERE_RADIUS = 0.2;
-
 const STEPS_PER_FRAME = 5;
 
 const playerCollider = new Capsule(
