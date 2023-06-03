@@ -141,7 +141,7 @@ sunLight.shadow.camera.top     =  10;
 sunLight.shadow.camera.bottom  = -10;
 sunLight.shadow.mapSize.width  = 4096;
 sunLight.shadow.mapSize.height = 4096;
-sunLight.shadow.radius         = 6;
+sunLight.shadow.radius         = 4;
 sunLight.target                = camera
 scene.add( sunLight );
 
