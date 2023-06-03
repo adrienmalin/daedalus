@@ -100,8 +100,8 @@ const renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap  ;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.type    = THREE.PCFShadowMap   ;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
 container.appendChild( renderer.domElement );
 
 // Water
@@ -124,98 +124,6 @@ water.position.y = -.01
 water.receiveShadow = true;
 scene.add( water );
 
-// Ground
-
-const groundGeometry = new THREE.PlaneGeometry(mazeLength, mazeWidth)
-groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping
-groundTexture.repeat.set(50, 50)
-const groundMaterial = new THREE.MeshPhongMaterial( {
-    map       : groundTexture,
-    color     : 0xFFFFFF,
-    emissive  : 0,
-    specular  : 0x000000,
-    shininess : 5,
-    bumpMap   : groundTexture,
-    bumpScale : .02,
-    depthFunc : 3,
-    depthTest : true,
-    depthWrite: true
-} )
-const ground = new THREE.Mesh( groundGeometry, groundMaterial )
-ground.rotation.x = - Math.PI / 2;
-ground.position.set(mazeLength/2, 0, mazeWidth/2)
-ground.receiveShadow = true;
-ground.matrixAutoUpdate = false
-ground.updateMatrix();
-scene.add(ground)
-worldOctree.fromGraphNode( ground )
-
-// Raft
-
-const raftGeometry = new THREE.BoxGeometry( 1.8, .1, .9, 1, 1, 8 )
-const raftMaterial = new THREE.MeshPhongMaterial( {
-    map              : woodTexture,
-    color            : 0xFFFFFF,
-    emissive         : 0,
-    specular         : 0x505050,
-    shininess        : 1,
-    bumpMap          : woodTexture,
-    bumpScale        : .1,
-    depthFunc        : 3,
-    depthTest        : true,
-    depthWrite       : true,
-    displacementMap  : woodTexture,
-    displacementScale: -0.08
-} )
-const raft = new THREE.Mesh( raftGeometry, raftMaterial )
-raft.position.set( mazeLength/2 + .2, 0, -1 )
-raft.rotation.y     = 1.4
-raft.rotation.order = 'ZXY';
-raft.castShadow     = true;
-scene.add(raft)
-worldOctree.fromGraphNode( raft )
-raftOctree.fromGraphNode( raft )
-
-// Maze
-
-const wallGeometry = new THREE.BoxGeometry( 1, 1, 1 )
-const wallMaterial = new THREE.MeshPhongMaterial( {
-    map       : wallTexture,
-    color     : 0xFFFFFF,
-    emissive  : 0,
-    specular  : 0x505050,
-    shininess : 7,
-    bumpMap   : wallTexture,
-    bumpScale : .02,
-    depthFunc : 3,
-    depthTest : true,
-    depthWrite: true
-} )
-
-const mazeMap = new Labyrinthe(mazeLength, mazeWidth)
-const maze = new THREE.InstancedMesh( wallGeometry, wallMaterial, mazeMap.walls );
-let matrix = new THREE.Matrix4()
-const cube = new THREE.Mesh(wallGeometry)
-let i=0
-mazeMap.forEach((row, z) => {
-    row.forEach((isWall, x) => {
-        if (isWall) {
-            matrix.setPosition(x + .5, 0.5, z + .5)
-            maze.setMatrixAt( i, matrix );
-            const clone = cube.clone()
-            clone.position.set(x + .5, 0.5, z + .5)
-            worldOctree.fromGraphNode( clone )
-            i++
-        }
-    })
-})
-maze.castShadow    = true;
-maze.receiveShadow = true;
-maze.matrixAutoUpdate = false
-scene.add(maze)
-
-camera.position.copy(mazeMap.start)
-
 // Lights
 
 const ambientLight = new THREE.AmbientLight( 0x404040 , 1 ); // soft white light
@@ -231,6 +139,7 @@ sunLight.shadow.camera.top     =  10;
 sunLight.shadow.camera.bottom  = -10;
 sunLight.shadow.mapSize.width  = 4096;
 sunLight.shadow.mapSize.height = 4096;
+sunLight.shadow.radius         = 4;
 sunLight.target                = camera
 scene.add( sunLight );
 
@@ -327,7 +236,99 @@ function updateSun() {
 updateSun();
 const updateSunIntervalId = setInterval( updateSun, 100 );
 
-// showGUI
+// Ground
+
+const groundGeometry = new THREE.PlaneGeometry(mazeLength, mazeWidth)
+groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping
+groundTexture.repeat.set(50, 50)
+const groundMaterial = new THREE.MeshPhongMaterial( {
+    map       : groundTexture,
+    color     : 0xFFFFFF,
+    emissive  : 0,
+    specular  : 0x000000,
+    shininess : 5,
+    bumpMap   : groundTexture,
+    bumpScale : .02,
+    depthFunc : 3,
+    depthTest : true,
+    depthWrite: true
+} )
+const ground = new THREE.Mesh( groundGeometry, groundMaterial )
+ground.rotation.x = - Math.PI / 2;
+ground.position.set(mazeLength/2, 0, mazeWidth/2)
+ground.receiveShadow = true;
+ground.matrixAutoUpdate = false
+ground.updateMatrix();
+scene.add(ground)
+worldOctree.fromGraphNode( ground )
+
+// Raft
+
+const raftGeometry = new THREE.BoxGeometry( 1.8, .1, .9, 1, 1, 8 )
+const raftMaterial = new THREE.MeshPhongMaterial( {
+    map              : woodTexture,
+    color            : 0xFFFFFF,
+    emissive         : 0,
+    specular         : 0x505050,
+    shininess        : 1,
+    bumpMap          : woodTexture,
+    bumpScale        : .1,
+    depthFunc        : 3,
+    depthTest        : true,
+    depthWrite       : true,
+    displacementMap  : woodTexture,
+    displacementScale: -0.08
+} )
+const raft = new THREE.Mesh( raftGeometry, raftMaterial )
+raft.position.set( mazeLength/2 + .2, 0, -1 )
+raft.rotation.y     = 1.4
+raft.rotation.order = 'ZXY';
+raft.castShadow     = true;
+scene.add(raft)
+worldOctree.fromGraphNode( raft )
+raftOctree.fromGraphNode( raft )
+
+// Maze
+
+const wallGeometry = new THREE.BoxGeometry( 1, 1, 1 )
+const wallMaterial = new THREE.MeshPhongMaterial( {
+    map       : wallTexture,
+    color     : 0xFFFFFF,
+    emissive  : 0,
+    specular  : 0x505050,
+    shininess : 7,
+    bumpMap   : wallTexture,
+    bumpScale : .02,
+    depthFunc : 3,
+    depthTest : true,
+    depthWrite: true
+} )
+
+const mazeMap = new Labyrinthe(mazeLength, mazeWidth)
+const maze = new THREE.InstancedMesh( wallGeometry, wallMaterial, mazeMap.walls );
+let matrix = new THREE.Matrix4()
+const cube = new THREE.Mesh(wallGeometry)
+let i=0
+mazeMap.forEach((row, z) => {
+    row.forEach((isWall, x) => {
+        if (isWall) {
+            matrix.setPosition(x + .5, 0.5, z + .5)
+            maze.setMatrixAt( i, matrix );
+            const clone = cube.clone()
+            clone.position.set(x + .5, 0.5, z + .5)
+            worldOctree.fromGraphNode( clone )
+            i++
+        }
+    })
+})
+maze.castShadow    = true;
+maze.receiveShadow = true;
+maze.matrixAutoUpdate = false
+scene.add(maze)
+
+camera.position.copy(mazeMap.start)
+
+// debug
 
 let stats, octreeHelper, gui
 if ( showGUI ) {
