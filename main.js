@@ -106,7 +106,7 @@ container.appendChild( renderer.domElement );
 
 // Water
 waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
-const water = new Water(
+const ocean = new Water(
     new THREE.PlaneGeometry( 10000, 10000 ),
     {
         textureWidth   : 512,
@@ -119,10 +119,10 @@ const water = new Water(
         fog            : scene.fog !== undefined
     }
 );
-water.rotation.x = - Math.PI / 2;
-water.position.y = -.01
-water.receiveShadow = true;
-scene.add( water );
+ocean.rotation.x = - Math.PI / 2;
+ocean.position.y = -.01
+ocean.receiveShadow = true;
+scene.add( ocean );
 
 // Lights
 
@@ -211,7 +211,7 @@ function updateSun() {
     sun.setFromSphericalCoords( 100, phi, theta );
 
     sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
-    water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+    ocean.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
 
     if ( elevation >= 0 ) {
 
@@ -359,7 +359,7 @@ if ( showGUI ) {
     folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
     folderSky.open();
 
-    const waterUniforms = water.material.uniforms;
+    const waterUniforms = ocean.material.uniforms;
 
     const folderWater = gui.addFolder( 'Water' );
     folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
@@ -608,7 +608,7 @@ function animate() {
 
     const time = clock.elapsedTime;
 
-    water.material.uniforms[ 'time' ].value += 1.0 / 100.0;
+    ocean.material.uniforms[ 'time' ].value += 1.0 / 100.0;
     raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
     raft.rotation.x = 0.06 * Math.cos( time )
     raft.position.y = 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
