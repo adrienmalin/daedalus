@@ -116,12 +116,14 @@ const ocean = new Water(
         sunColor       : 0xffffff,
         waterColor     : 0x001e0f,
         distortionScale: 3.7,
-        fog            : scene.fog !== undefined
+        fog            : scene.fog !== undefined,
+        alpha          : 0.5
     }
 );
 ocean.rotation.x = - Math.PI / 2;
 ocean.position.y = -.01
 ocean.receiveShadow = true;
+ocean.material.transparent = true;
 scene.add( ocean );
 
 // Lights
@@ -144,15 +146,6 @@ sunLight.target                = camera
 scene.add( sunLight );
 
 const torchLight = new THREE.SpotLight(0xffffe8, 1, mazeLength/2, .45, 1)
-/*torchLight.castShadow            = true;
-torchLight.shadow.camera.near    = 20;
-torchLight.shadow.camera.far     = 200;
-torchLight.shadow.camera.right   = 30;
-torchLight.shadow.camera.left    = -30;
-torchLight.shadow.camera.top     = 30;
-torchLight.shadow.camera.bottom  = -30;
-torchLight.shadow.mapSize.width  = 512;
-torchLight.shadow.mapSize.height = 512;*/
 scene.add( torchLight );
 scene.add( torchLight.target );
 
