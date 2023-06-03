@@ -107,7 +107,7 @@ container.appendChild( renderer.domElement );
 // Water
 waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
 const ocean = new Water(
-    new THREE.PlaneGeometry( 10000, 10000 ),
+    new THREE.PlaneGeometry( 1000, 1000 ),
     {
         textureWidth   : 512,
         textureHeight  : 512,
