@@ -117,7 +117,7 @@ const ocean = new Water(
         waterColor     : 0x001e0f,
         distortionScale: 3.7,
         fog            : scene.fog !== undefined,
-        alpha          : 0.5
+        alpha          : 0.7
     }
 );
 ocean.rotation.x = - Math.PI / 2;
