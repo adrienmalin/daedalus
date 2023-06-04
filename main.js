@@ -31,7 +31,7 @@ class MazeMesh extends THREE.InstancedMesh {
         this.map.forEach((row, z) => {
             row.forEach((isWall, x) => {
                 if (isWall) {
-                    matrix.setPosition(x + .5, 0.5, z + .5)
+                    matrix.setPosition( x + .5 - width/2, 0.5, z + .5 - length/2)
                     this.setMatrixAt( i, matrix );
                     i++
                 }
@@ -101,6 +101,7 @@ const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.rotation.order = 'YXZ';
+camera.position.set( 0, 0.7, 0);
 
 const worldOctree = new Octree();
 const raftOctree = new Octree();
@@ -260,7 +261,6 @@ const groundMaterial = new THREE.MeshPhongMaterial( {
 } )
 const ground = new THREE.Mesh( groundGeometry, groundMaterial )
 ground.rotation.x = - Math.PI / 2;
-ground.position.set(mazeLength/2, 0, mazeWidth/2)
 ground.receiveShadow = true;
 ground.matrixAutoUpdate = false
 ground.updateMatrix();
@@ -285,7 +285,7 @@ const raftMaterial = new THREE.MeshPhongMaterial( {
     displacementScale: -0.08
 } )
 const raft = new THREE.Mesh( raftGeometry, raftMaterial )
-raft.position.set( mazeLength/2 + .2, 0, -1 )
+raft.position.set( .2, 0, -1 - mazeWidth/2 )
 raft.rotation.y     = 1.4
 raft.rotation.order = 'ZXY';
 raft.castShadow     = true;
@@ -322,8 +322,6 @@ for ( let i=0; i<maze.count; i++ ) {
     clone.position.setFromMatrixPosition( matrix )
     worldOctree.fromGraphNode( clone )
 }
-
-camera.position.copy( maze.start );
 
 // debug
 
@@ -381,8 +379,8 @@ const GRAVITY = 30;
 const STEPS_PER_FRAME = 5;
 
 const playerCollider = new Capsule(
-    new THREE.Vector3( mazeLength/2, 0.3, mazeWidth/2 ),
-    new THREE.Vector3( mazeLength/2, 0.7, mazeWidth/2 ),
+    new THREE.Vector3( 0, 0.3, 0 ),
+    new THREE.Vector3( 0, 0.7, 0 ),
     0.3
 );
 
@@ -450,8 +448,7 @@ function playerCollisions() {
 
     if ( !escaped && raftOctree.capsuleIntersect( playerCollider ) ) {
 
-        message.className = "escaped";
-        piano.play();
+        gameEnd()
 
     }
 
@@ -475,10 +472,17 @@ function playerCollisions() {
 
 }
 
-addEventListener("animationend", (event) => {
+function gameEnd() {
 
     escaped = true;
-    clearInterval( updateSunIntervalId );
+    message.className = "escaped";
+    piano.play();
+        
+}
+
+addEventListener("animationend", (event) => {
+
+    //clearInterval( updateSunIntervalId );
     //document.exitPointerLock();
 
 });
@@ -575,8 +579,8 @@ function teleportPlayerIfOob() {
 
     if ( camera.position.y <= - 25 ) {
 
-        playerCollider.start.set( mazeLength/2, 0.3, mazeWidth/2 );
-        playerCollider.end.set( mazeLength/2, 0.7, mazeWidth/2 );
+        playerCollider.start.set( 0, 0.3, 0 );
+        playerCollider.end.set( 0, 0.7, 0 );
         playerCollider.radius = 0.3;
         camera.position.copy( playerCollider.end );
         camera.rotation.set( 0, 0, 0 );
