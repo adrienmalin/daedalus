@@ -12,50 +12,59 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 
-const DIRECTIONS = [
-    new THREE.Vector3( 0, 0, -1),
-    new THREE.Vector3( 0, 0,  1),
-    new THREE.Vector3(-1, 0,  0),
-    new THREE.Vector3( 1, 0,  0),
-]
-
-class Labyrinthe extends Array {
-    constructor(width, length) {
-        super()
-        for (let row=0; row < length; row++) {
-            this.push(new Array(width).fill(1))
-        }
+class MazeMesh extends THREE.InstancedMesh {
+    constructor( geometry, material, width, length) {
+        super( geometry, material, width*length - 2 )
         this.length = length
         this.width = width
+        this.map = new Array(length).fill().map(() => new Array(width).fill(1))
         this.start = new THREE.Vector3(width/2, .1, length/2)
         this.exit = new THREE.Vector3(Math.floor(width/2), 0, 1)
+        this.count = length * width - 2
+
         this.dig(this.exit)
         this.dig(new THREE.Vector3(Math.floor(width/2), 0, 0))
-        this.walls = length * width - 2
-        this.build(this.exit)
+        this.build ( this.exit )
+        let matrix = new THREE.Matrix4()
+        let i=0
+        this.map.forEach((row, z) => {
+            row.forEach((isWall, x) => {
+                if (isWall) {
+                    matrix.setPosition(x + .5, 0.5, z + .5)
+                    this.setMatrixAt( i, matrix );
+                    i++
+                }
+            })
+        })
+    }
+    
+    dig(position) {
+        this.map[position.z][position.x] = 0
     }
 
+    static DIRECTIONS = [
+        new THREE.Vector3( 0, 0, -1),
+        new THREE.Vector3( 0, 0,  1),
+        new THREE.Vector3(-1, 0,  0),
+        new THREE.Vector3( 1, 0,  0),
+    ]
     build(position) {
-        for (var direction of Array.from(DIRECTIONS).sort(x => .5 - Math.random())) {
+        for (var direction of Array.from(this.constructor.DIRECTIONS).sort(x => .5 - Math.random())) {
             var step1 = position.clone().add(direction)
             var step2 = step1.clone().add(direction)
             if (this.isWall(step2) == 1) {
                 this.dig(step1)
                 this.dig(step2)
-                this.walls -= 2
+                this.count -= 2
                 this.build(step2)
             }
         }
-    }
-    
-    dig(position) {
-        this[position.z][position.x] = 0
     }
 
     isWall(position) {
         if (0 <= position.x && position.x < this.width &&
             0 <= position.z && position.z < this.length) {
-            return this[Math.floor(position.z)][Math.floor(position.x)]
+            return this.map[Math.floor(position.z)][Math.floor(position.x)]
         } else {
             return -1
         }
@@ -298,29 +307,22 @@ const wallMaterial = new THREE.MeshPhongMaterial( {
     depthWrite: true
 } )
 
-const mazeMap = new Labyrinthe(mazeLength, mazeWidth)
-const maze = new THREE.InstancedMesh( wallGeometry, wallMaterial, mazeMap.walls );
-let matrix = new THREE.Matrix4()
-const cube = new THREE.Mesh(wallGeometry)
-let i=0
-mazeMap.forEach((row, z) => {
-    row.forEach((isWall, x) => {
-        if (isWall) {
-            matrix.setPosition(x + .5, 0.5, z + .5)
-            maze.setMatrixAt( i, matrix );
-            const clone = cube.clone()
-            clone.position.set(x + .5, 0.5, z + .5)
-            worldOctree.fromGraphNode( clone )
-            i++
-        }
-    })
-})
+const maze = new MazeMesh( wallGeometry, wallMaterial, mazeLength, mazeWidth );
 maze.castShadow    = true;
 maze.receiveShadow = true;
 maze.matrixAutoUpdate = false
 scene.add(maze)
 
-camera.position.copy(mazeMap.start)
+const cube = new THREE.Mesh( wallGeometry );
+let matrix = new THREE.Matrix4()
+for ( let i=0; i<maze.count; i++ ) {
+    maze.getMatrixAt( i, matrix )
+    const clone = cube.clone()
+    clone.position.setFromMatrixPosition( matrix )
+    worldOctree.fromGraphNode( clone )
+}
+
+camera.position.copy( maze.start );
 
 // debug
 
