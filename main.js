@@ -88,7 +88,7 @@ piano.loop          = false
 const loadMngr      = new THREE.LoadingManager();
 const loader        = new THREE.TextureLoader(loadMngr);
 const waterTexture  = loader.load('img/waternormals.jpg');
-const groundTexture = loader.load('img/ground.jpg');
+const groundTexture = loader.load('img/pavement.jpg');
 const wallTexture   = loader.load('img/wall.jpg');
 const woodTexture   = loader.load('img/wood.jpg');
 loadMngr.onLoad = () => {
@@ -297,12 +297,12 @@ raftOctree.fromGraphNode( raft )
 
 const wallMaterial = new THREE.MeshPhongMaterial( {
     map       : wallTexture,
-    color     : 0xFFFFFF,
+    color     : 0xFCF8E5,
     emissive  : 0,
     specular  : 0x505050,
-    shininess : 7,
+    shininess : 4,
     bumpMap   : wallTexture,
-    bumpScale : .02,
+    bumpScale : .01,
     depthFunc : 3,
     depthTest : true,
     depthWrite: true
@@ -336,7 +336,7 @@ if ( showGUI ) {
     octreeHelper.visible = false;
     scene.add( octreeHelper );
     const lightHelper = new THREE.DirectionalLightHelper( sunLight, .5 )
-    lightHelper.position.copy(mazeMap.start)
+    lightHelper.position.copy(maze.start)
     lightHelper.visible = false;
     scene.add( lightHelper );
     var cameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
