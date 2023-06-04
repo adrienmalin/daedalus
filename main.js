@@ -12,9 +12,10 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 
+const mazeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 class MazeMesh extends THREE.InstancedMesh {
-    constructor( geometry, material, width, length) {
-        super( geometry, material, width*length - 2 )
+    constructor( width, length, material ) {
+        super( mazeGeometry, material, width*length - 2 );
         this.length = length
         this.width = width
         this.map = new Array(length).fill().map(() => new Array(width).fill(1))
@@ -293,7 +294,6 @@ raftOctree.fromGraphNode( raft )
 
 // Maze
 
-const wallGeometry = new THREE.BoxGeometry( 1, 1, 1 )
 const wallMaterial = new THREE.MeshPhongMaterial( {
     map       : wallTexture,
     color     : 0xFFFFFF,
@@ -307,17 +307,17 @@ const wallMaterial = new THREE.MeshPhongMaterial( {
     depthWrite: true
 } )
 
-const maze = new MazeMesh( wallGeometry, wallMaterial, mazeLength, mazeWidth );
+const maze = new MazeMesh( mazeLength, mazeWidth, wallMaterial );
 maze.castShadow    = true;
 maze.receiveShadow = true;
 maze.matrixAutoUpdate = false
 scene.add(maze)
 
-const cube = new THREE.Mesh( wallGeometry );
+const wall = new THREE.Mesh( maze.geometry );
 let matrix = new THREE.Matrix4()
 for ( let i=0; i<maze.count; i++ ) {
     maze.getMatrixAt( i, matrix )
-    const clone = cube.clone()
+    const clone = wall.clone()
     clone.position.setFromMatrixPosition( matrix )
     worldOctree.fromGraphNode( clone )
 }
