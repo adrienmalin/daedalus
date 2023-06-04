@@ -38,10 +38,9 @@ body {
   color: gray;
   justify-content: center;
   animation: escaped 5s;
-  height: 50vh;
-  padding-top: 50vh;
+  height: 60vh;
+  padding-top: 40vh;
   opacity: 100%;
-  background: white;
   cursor: default;
   z-index: 1;
 }

@@ -83,6 +83,7 @@ let showStats = window.location.search.includes("stats")
 const ambiance      = new Audio("snd/ambiance.mp3")
 ambiance.loop       = true
 const piano         = new Audio("snd/waves-and-tears.mp3")
+piano.loop          = false
 
 const loadMngr      = new THREE.LoadingManager();
 const loader        = new THREE.TextureLoader(loadMngr);
@@ -390,7 +391,7 @@ const playerDirection = new THREE.Vector3();
 
 let playerOnFloor = false;
 let jumping       = false;
-let stopAnimation       = false;
+let escaped       = false;
 
 const keyStates = {};
 
@@ -447,7 +448,7 @@ function onWindowResize() {
 
 function playerCollisions() {
 
-    if ( !stopAnimation && raftOctree.capsuleIntersect( playerCollider ) ) {
+    if ( !escaped && raftOctree.capsuleIntersect( playerCollider ) ) {
 
         message.className = "escaped";
         piano.play();
@@ -476,9 +477,9 @@ function playerCollisions() {
 
 addEventListener("animationend", (event) => {
 
-    stopAnimation = true;
+    escaped = true;
     clearInterval( updateSunIntervalId );
-    document.exitPointerLock();
+    //document.exitPointerLock();
 
 });
 
@@ -579,6 +580,7 @@ function teleportPlayerIfOob() {
         playerCollider.radius = 0.3;
         camera.position.copy( playerCollider.end );
         camera.rotation.set( 0, 0, 0 );
+        message.className= "" 
 
     }
 
@@ -630,6 +632,6 @@ function animate() {
 
     if ( showStats ) stats.update();
 
-    if ( !stopAnimation ) requestAnimationFrame( animate );
+    requestAnimationFrame( animate );
 
 }
