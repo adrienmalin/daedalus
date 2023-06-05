@@ -424,8 +424,9 @@ function gameEnd() {
 
 addEventListener("animationend", (event) => {
 
-    //clearInterval( updateSunIntervalId );
-    //document.exitPointerLock();
+    clearInterval( updateSunIntervalId );
+    document.exitPointerLock();
+    container.style.cursor = "default";
 
 });
 
