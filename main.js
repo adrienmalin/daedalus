@@ -12,7 +12,7 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 
-import { MazeMesh } from 'MazeMesh';
+import { MazeMesh } from './MazeMesh.js';
 
 const latitude  = THREE.MathUtils.degToRad(35)
 const longitude = THREE.MathUtils.degToRad(25)
@@ -74,7 +74,7 @@ const ocean = new Water(
         alpha          : 0.7
     }
 );
-ocean.rotation.x = - Math.PI / 2;
+ocean.rotation.x = - Math.PI * 0.5;
 ocean.position.y = -.01
 ocean.receiveShadow = true;
 ocean.material.transparent = true;
@@ -553,9 +553,9 @@ function animate() {
     const time = clock.elapsedTime;
 
     ocean.material.uniforms[ 'time' ].value += 1.0 / 100.0;
-    raft.rotation.z = 0.12 * Math.cos( 1.2 * time ) 
-    raft.rotation.x = 0.06 * Math.cos( time )
-    raft.position.y = 0.05 * (0.5 * Math.sin( 1.2 * time ) + 0.5 * Math.sin( time ))
+    raft.rotation.z = 0.06 * Math.cos( 1.1 * time ) 
+    raft.rotation.x = 0.05 * Math.cos( 1.0 * time )
+    raft.position.y = 0.03 * (0.6 * Math.sin( 1.1 * time ) + 0.5 * Math.sin( 1.0 * time ))
 
     if ( sunLight.visible ) {
     
