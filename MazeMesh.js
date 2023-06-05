@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 const mazeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 
-class MazeMesh extends THREE.InstancedMesh {
+export default class MazeMesh extends THREE.InstancedMesh {
     constructor( width, length, material ) {
         super( mazeGeometry, material, width*length - 2 );
         this.length = length
@@ -60,5 +60,3 @@ class MazeMesh extends THREE.InstancedMesh {
         }
     }
 }
-
-export { MazeMesh }

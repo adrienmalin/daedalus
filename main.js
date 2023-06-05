@@ -12,7 +12,7 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 
-import { MazeMesh } from './MazeMesh.js';
+import MazeMesh from './MazeMesh.js';
 
 const latitude  = THREE.MathUtils.degToRad(35)
 const longitude = THREE.MathUtils.degToRad(25)
