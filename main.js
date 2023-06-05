@@ -532,10 +532,60 @@ function teleportPlayerIfOob() {
 
 }
 
+const waves = {
+    A: {
+        direction: 0,
+        steepness: 0.015,
+        wavelength: 10,
+    },
+    B: {
+        direction: 30,
+        steepness: 0.015,
+        wavelength: 5,
+    },
+    C: {
+        direction: 60,
+        steepness: 0.015,
+        wavelength: 3,
+    },
+}
+
+function getWaveInfo(x, z, time) {
+    const pos = new THREE.Vector3()
+    const tangent = new THREE.Vector3(1, 0, 0)
+    const binormal = new THREE.Vector3(0, 0, 1)
+    Object.keys(waves).forEach(function (wave) {
+        const w = waves[wave]
+        const k = (Math.PI * 2) / w.wavelength
+        const c = Math.sqrt(9.8 / k)
+        const d = new THREE.Vector2(
+            Math.sin((w.direction * Math.PI) / 180),
+            -Math.cos((w.direction * Math.PI) / 180)
+        )
+        const f = k * (d.dot(new THREE.Vector2(x, z)) - c * time)
+        const a = w.steepness / k
+        pos.x += d.y * (a * Math.cos(f))
+        pos.y += a * Math.sin(f)
+        pos.z += d.x * (a * Math.cos(f))
+        tangent.x += -d.x * d.x * (w.steepness * Math.sin(f))
+        tangent.y += d.x * (w.steepness * Math.cos(f))
+        tangent.z += -d.x * d.y * (w.steepness * Math.sin(f))
+        binormal.x += -d.x * d.y * (w.steepness * Math.sin(f))
+        binormal.y += d.y * (w.steepness * Math.cos(f))
+        binormal.z += -d.y * d.y * (w.steepness * Math.sin(f))
+    })
+    const normal = binormal.cross(tangent).normalize()
+    return {
+        position: pos,
+        normal: normal,
+    }
+}
+
 
 function animate() {
 
-    const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
+    const delta = Math.min( 0.05, clock.getDelta() )
+    const deltaTime = delta / STEPS_PER_FRAME;
 
     // we look for collisions in substeps to mitigate the risk of
     // an object traversing another too quickly for detection.
@@ -553,9 +603,12 @@ function animate() {
     const time = clock.elapsedTime;
 
     ocean.material.uniforms[ 'time' ].value += 1.0 / 100.0;
-    raft.rotation.z = 0.06 * Math.cos( 1.1 * time ) 
-    raft.rotation.x = 0.05 * Math.cos( 1.0 * time )
-    raft.position.y = 0.03 * (0.6 * Math.sin( 1.1 * time ) + 0.5 * Math.sin( 1.0 * time ))
+    const waveInfo = getWaveInfo(raft.position.x, raft.position.z, time)
+    raft.position.y = waveInfo.position.y
+    const quat = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(waveInfo.normal.x, waveInfo.normal.y, waveInfo.normal.z)
+    )
+    raft.quaternion.rotateTowards(quat, delta * 0.5)
 
     if ( sunLight.visible ) {
     
