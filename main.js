@@ -613,9 +613,7 @@ function animate() {
 
     if ( sunLight.visible ) {
     
-        sunLight.position.copy( sun )
-        sunLight.position.x += camera.position.x
-        sunLight.position.z += camera.position.z
+        sunLight.position.copy( sun ).add( camera.position )
 
     }
 
