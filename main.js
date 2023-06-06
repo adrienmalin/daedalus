@@ -46,7 +46,7 @@ camera.rotation.order = 'YXZ';
 camera.position.set( 0, 0.7, 0);
 
 const worldOctree = new Octree();
-const raftOctree = new Octree();
+const raftOctree  = new Octree();
 
 const container = document.getElementById( 'container' );
 
@@ -74,9 +74,9 @@ const ocean = new Water(
         alpha          : 0.7
     }
 );
-ocean.rotation.x = - Math.PI * 0.5;
-ocean.position.y = -.01
-ocean.receiveShadow = true;
+ocean.rotation.x           = - Math.PI * 0.5;
+ocean.position.y           = -.01
+ocean.receiveShadow        = true;
 ocean.material.transparent = true;
 scene.add( ocean );
 
@@ -152,7 +152,7 @@ function updateSun() {
     
     }
 
-    const phi = Math.PI/2 - elevation
+    const phi   = Math.PI/2 - elevation
     const theta = azimuth
 
     sun.setFromSphericalCoords( 100, phi, theta );
@@ -163,7 +163,7 @@ function updateSun() {
 
     if ( elevation >= 0 ) {
 
-        sunLight.visible = true
+        sunLight.visible   = true
         torchLight.visible = false
 
     }  else {
@@ -187,7 +187,7 @@ const updateSunIntervalId = setInterval( updateSun, 100 );
 // Ground
 
 const groundGeometry = new THREE.PlaneGeometry(mazeLength, mazeWidth)
-groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping
+groundTexture.wrapS  = groundTexture.wrapT = THREE.RepeatWrapping
 groundTexture.repeat.set(50, 50)
 const groundMaterial = new THREE.MeshPhongMaterial( {
     map       : groundTexture,
@@ -251,10 +251,12 @@ const wallMaterial = new THREE.MeshPhongMaterial( {
 } )
 
 const maze = new MazeMesh( mazeLength, mazeWidth, wallMaterial );
-maze.castShadow    = true;
-maze.receiveShadow = true;
+maze.castShadow       = true;
+maze.receiveShadow    = true;
 maze.matrixAutoUpdate = false
 scene.add(maze)
+
+console.log(String(maze))
 
 const wall = new THREE.Mesh( maze.geometry );
 let matrix = new THREE.Matrix4()
@@ -264,8 +266,6 @@ for ( let i=0; i<maze.count; i++ ) {
     clone.position.setFromMatrixPosition( matrix )
     worldOctree.fromGraphNode( clone )
 }
-
-console.log(String(maze))
 
 // debug
 
@@ -554,8 +554,8 @@ const waves = {
 }
 
 function getWaveInfo(x, z, time) {
-    const pos = new THREE.Vector3()
-    const tangent = new THREE.Vector3(1, 0, 0)
+    const pos      = new THREE.Vector3()
+    const tangent  = new THREE.Vector3(1, 0, 0)
     const binormal = new THREE.Vector3(0, 0, 1)
     Object.keys(waves).forEach(function (wave) {
         const w = waves[wave]
