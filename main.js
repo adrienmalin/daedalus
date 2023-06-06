@@ -14,10 +14,10 @@ import { Sky } from 'three/addons/objects/Sky.js';
 
 import MazeMesh from './MazeMesh.js';
 
-const latitude  = THREE.MathUtils.degToRad(35)
-const longitude = THREE.MathUtils.degToRad(25)
-const mazeLength = 51
-const mazeWidth = 51
+const mazeLength = 23
+const mazeWidth  = 23
+const latitude   = THREE.MathUtils.degToRad(35)
+const longitude  = THREE.MathUtils.degToRad(25)
 
 let showGUI = window.location.search.includes("debug")
 let showStats = window.location.search.includes("stats")
@@ -264,6 +264,8 @@ for ( let i=0; i<maze.count; i++ ) {
     clone.position.setFromMatrixPosition( matrix )
     worldOctree.fromGraphNode( clone )
 }
+
+console.log(String(maze))
 
 // debug
 

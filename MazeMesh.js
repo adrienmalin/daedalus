@@ -59,4 +59,10 @@ export default class MazeMesh extends THREE.InstancedMesh {
             return -1
         }
     }
+
+    toString() {
+        return this.map.map(row => 
+            row.map(isWall => isWall? "██":"░░").join("")
+        ).join("\n")
+    }
 }
