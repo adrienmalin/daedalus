@@ -11,7 +11,7 @@ body {
 #container {
   position: absolute;
   z-index: 0;
-  cursor: pointer;
+  cursor: grab;
 }
 
 @keyframes escaped{
