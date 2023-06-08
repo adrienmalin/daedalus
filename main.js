@@ -188,7 +188,7 @@ const updateSunIntervalId = setInterval( updateSun, 100 );
 
 const groundGeometry = new THREE.PlaneGeometry(mazeLength, mazeWidth)
 groundTexture.wrapS  = groundTexture.wrapT = THREE.RepeatWrapping
-groundTexture.repeat.set(50, 50)
+groundTexture.repeat.set(mazeLength/2, mazeWidth/2)
 const groundMaterial = new THREE.MeshPhongMaterial( {
     map       : groundTexture,
     color     : 0xFFFFFF,
