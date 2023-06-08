@@ -43,7 +43,7 @@ const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.rotation.order = 'YXZ';
-camera.position.set( 0, 0.7, 0);
+camera.position.set( 0, 25, 0 );
 
 const worldOctree = new Octree();
 const raftOctree  = new Octree();
@@ -235,6 +235,8 @@ scene.add(raft)
 worldOctree.fromGraphNode( raft )
 raftOctree.fromGraphNode( raft )
 
+camera.lookAt( raft.position.x, raft.position.y, raft.position.z );
+
 // Maze
 
 const wallMaterial = new THREE.MeshPhongMaterial( {
@@ -323,8 +325,8 @@ const GRAVITY = 30;
 const STEPS_PER_FRAME = 5;
 
 const playerCollider = new Capsule(
-    new THREE.Vector3( 0, 0.3, 0 ),
-    new THREE.Vector3( 0, 0.7, 0 ),
+    new THREE.Vector3( 0, 25, 0 ),
+    new THREE.Vector3( 0, 25.5, 0 ),
     0.3
 );
 
@@ -524,8 +526,8 @@ function teleportPlayerIfOob() {
 
     if ( camera.position.y <= - 25 ) {
 
-        playerCollider.start.set( 0, 0.3, 0 );
-        playerCollider.end.set( 0, 0.7, 0 );
+        playerCollider.start.set( 0, 25, 0 );
+        playerCollider.end.set( 0, 25.5, 0 );
         playerCollider.radius = 0.3;
         camera.position.copy( playerCollider.end );
         camera.rotation.set( 0, 0, 0 );
