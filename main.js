@@ -146,17 +146,17 @@ const ambientLight = new THREE.AmbientLight(0x404040, 1); // soft white light
 scene.add(ambientLight);
 
 const sunLight = new THREE.DirectionalLight(0xffffff, 0.3);
-sunLight.castShadow = true;
-sunLight.shadow.camera.near = 20;
-sunLight.shadow.camera.far = 200;
-sunLight.shadow.camera.right = 10;
-sunLight.shadow.camera.left = -10;
-sunLight.shadow.camera.top = 10;
-sunLight.shadow.camera.bottom = -10;
-sunLight.shadow.mapSize.width = 4096;
+sunLight.castShadow            = true;
+sunLight.shadow.camera.near    = 20;
+sunLight.shadow.camera.far     = 250;
+sunLight.shadow.camera.right   =  10;
+sunLight.shadow.camera.left    = -10;
+sunLight.shadow.camera.top     =  10;
+sunLight.shadow.camera.bottom  = -10;
+sunLight.shadow.mapSize.width  = 4096;
 sunLight.shadow.mapSize.height = 4096;
-sunLight.shadow.radius = 4;
-sunLight.target = camera
+sunLight.shadow.radius         = 4;
+sunLight.target                = camera
 scene.add(sunLight);
 
 updateSun();
@@ -305,7 +305,7 @@ if (showParam) {
     showHelper.onChange(function (value) {
 
         lightHelper.visible = value;
-        octreeHelper.visible = value;
+        //octreeHelper.visible = value;
 
     });
 
