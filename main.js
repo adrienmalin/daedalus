@@ -1,14 +1,14 @@
 
 import * as THREE from 'three';
 
-import Stats from 'three/addons/libs/stats.module.js';
-
 import { Octree } from 'three/addons/math/Octree.js';
-import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { Sky } from 'three/addons/objects/Sky.js';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
+import Stats from 'three/addons/libs/stats.module.js';
 
 import MazeMesh from './MazeMesh.js';
 
@@ -436,6 +436,28 @@ let playerOnFloor = false;
 let jumping = false;
 let escaped = false;
 
+const pointerLockControls = new PointerLockControls(camera, document.body);
+
+container.addEventListener('click', function () {
+
+    pointerLockControls.lock();
+
+});
+
+pointerLockControls.addEventListener('lock', function () {
+
+    ambiance.play();
+
+});
+
+pointerLockControls.addEventListener('unlock', function () {
+
+    ambiance.pause();
+
+});
+
+scene.add(pointerLockControls.getObject());
+
 const keyStates = {};
 
 document.addEventListener('keydown', (event) => {
@@ -448,33 +470,6 @@ document.addEventListener('keyup', (event) => {
 
     keyStates[event.code] = false;
     if (event.code == 'Space') jumping = false
-
-});
-
-container.addEventListener('mousedown', () => {
-
-    document.body.requestPointerLock();
-
-});
-
-function lockChangeAlert() {
-    if (document.pointerLockElement === document.body) {
-        ambiance.play()
-    } else {
-        ambiance.pause()
-    }
-}
-
-document.addEventListener("pointerlockchange", lockChangeAlert, false);
-
-document.body.addEventListener('mousemove', (event) => {
-
-    if (document.pointerLockElement === document.body) {
-
-        camera.rotation.y -= event.movementX / 500;
-        camera.rotation.x -= event.movementY / 500;
-
-    }
 
 });
 
