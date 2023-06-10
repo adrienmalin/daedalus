@@ -64,6 +64,100 @@ camera.position.set(0, 25, 0);
 const worldOctree = new Octree();
 const raftOctree = new Octree();
 
+// Maze
+
+const wallTexture = loader.load('img/wall.jpg');
+const wallMaterial = new THREE.MeshPhongMaterial({
+    map: wallTexture,
+    color: 0xFCF8E5,
+    emissive: 0,
+    specular: 0x505050,
+    shininess: 4,
+    bumpMap: wallTexture,
+    bumpScale: .01,
+    depthFunc: 3,
+    depthTest: true,
+    depthWrite: true
+})
+
+const maze = new MazeMesh(mazeLength, mazeWidth, wallMaterial);
+maze.castShadow = true;
+maze.receiveShadow = true;
+maze.matrixAutoUpdate = false
+scene.add(maze)
+
+console.log(String(maze))
+
+const wall = new THREE.Mesh(maze.geometry);
+let matrix = new THREE.Matrix4()
+for (let i = 0; i < maze.count; i++) {
+    maze.getMatrixAt(i, matrix)
+    const clone = wall.clone()
+    clone.position.setFromMatrixPosition(matrix)
+    worldOctree.fromGraphNode(clone)
+}
+
+// Ground
+
+const pavementTexture = loader.load(
+    'img/pavement.jpg',
+    texture => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+        texture.repeat.set(mazeLength / 2, mazeWidth / 2)
+    }
+);
+const groundGeometry = new THREE.BoxGeometry(mazeLength, mazeWidth, 1)
+const groundMaterial = new THREE.MeshPhongMaterial({
+    map: pavementTexture,
+    color: 0xFFFFFF,
+    emissive: 0,
+    specular: 0x000000,
+    shininess: 5,
+    bumpMap: pavementTexture,
+    bumpScale: .02,
+    depthFunc: 3,
+    depthTest: true,
+    depthWrite: true
+})
+const sideGroundTexture = wallTexture.clone()
+sideGroundTexture.wrapS = sideGroundTexture.wrapT = THREE.RepeatWrapping
+sideGroundTexture.repeat.set(mazeLength, 1)
+const sideGroundMaterial = new THREE.MeshPhongMaterial({
+    map: sideGroundTexture,
+    color: 0xFCF8E5,
+    emissive: 0,
+    specular: 0x505050,
+    shininess: 4,
+    bumpMap: sideGroundTexture,
+    bumpScale: .01,
+    depthFunc: 3,
+    depthTest: true,
+    depthWrite: true
+})
+const ground = new THREE.Mesh(
+    groundGeometry,
+    [
+        sideGroundMaterial,
+        sideGroundMaterial,
+        sideGroundMaterial,
+        sideGroundMaterial,
+        groundMaterial,
+        groundMaterial,
+    ]
+)
+ground.rotation.x = - Math.PI / 2;
+ground.position.y = -0.5
+ground.receiveShadow = true;
+ground.matrixAutoUpdate = false
+ground.updateMatrix();
+scene.add(ground)
+
+const groundCollisioner = new THREE.Mesh(
+    new THREE.PlaneGeometry(mazeLength, mazeWidth)
+)
+groundCollisioner.rotation.x = - Math.PI / 2;
+worldOctree.fromGraphNode(groundCollisioner)
+
 // Water
 
 const waterGeometry = new THREE.PlaneGeometry(2048, 2048, 512, 512);
@@ -147,16 +241,16 @@ scene.add(ambientLight);
 
 const sunLight = new THREE.DirectionalLight(0xffffff, 0.3);
 sunLight.castShadow            = true;
-sunLight.shadow.camera.near    = 20;
-sunLight.shadow.camera.far     = 250;
-sunLight.shadow.camera.right   =  10;
-sunLight.shadow.camera.left    = -10;
-sunLight.shadow.camera.top     =  10;
-sunLight.shadow.camera.bottom  = -10;
+sunLight.shadow.camera.near    = 50;
+sunLight.shadow.camera.far     = 300;
+sunLight.shadow.camera.left    = -1.4 * mazeLength/2;
+sunLight.shadow.camera.right   =  1.4 * mazeLength/2;
+sunLight.shadow.camera.bottom  = -1.4 * mazeWidth/2;
+sunLight.shadow.camera.top     =  1.4 * mazeWidth/2;
 sunLight.shadow.mapSize.width  = 4096;
 sunLight.shadow.mapSize.height = 4096;
 sunLight.shadow.radius         = 4;
-sunLight.target                = camera
+sunLight.target                = maze
 scene.add(sunLight);
 
 updateSun();
@@ -186,102 +280,6 @@ raft.castShadow = true;
 worldOctree.fromGraphNode(raft)
 raftOctree.fromGraphNode(raft)
 scene.add(raft)
-
-// Maze
-
-const wallTexture = loader.load('img/wall.jpg');
-const wallMaterial = new THREE.MeshPhongMaterial({
-    map: wallTexture,
-    color: 0xFCF8E5,
-    emissive: 0,
-    specular: 0x505050,
-    shininess: 4,
-    bumpMap: wallTexture,
-    bumpScale: .01,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true
-})
-
-// Maze
-
-const maze = new MazeMesh(mazeLength, mazeWidth, wallMaterial);
-maze.castShadow = true;
-maze.receiveShadow = true;
-maze.matrixAutoUpdate = false
-scene.add(maze)
-
-console.log(String(maze))
-
-const wall = new THREE.Mesh(maze.geometry);
-let matrix = new THREE.Matrix4()
-for (let i = 0; i < maze.count; i++) {
-    maze.getMatrixAt(i, matrix)
-    const clone = wall.clone()
-    clone.position.setFromMatrixPosition(matrix)
-    worldOctree.fromGraphNode(clone)
-}
-
-// Ground
-
-const pavementTexture = loader.load(
-    'img/pavement.jpg',
-    texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(mazeLength / 2, mazeWidth / 2)
-    }
-);
-const groundGeometry = new THREE.BoxGeometry(mazeLength, mazeWidth, 1)
-const groundMaterial = new THREE.MeshPhongMaterial({
-    map: pavementTexture,
-    color: 0xFFFFFF,
-    emissive: 0,
-    specular: 0x000000,
-    shininess: 5,
-    bumpMap: pavementTexture,
-    bumpScale: .02,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true
-})
-const sideGroundTexture = wallTexture.clone()
-sideGroundTexture.wrapS = sideGroundTexture.wrapT = THREE.RepeatWrapping
-sideGroundTexture.repeat.set(mazeLength, 1)
-const sideGroundMaterial = new THREE.MeshPhongMaterial({
-    map: sideGroundTexture,
-    color: 0xFCF8E5,
-    emissive: 0,
-    specular: 0x505050,
-    shininess: 4,
-    bumpMap: sideGroundTexture,
-    bumpScale: .01,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true
-})
-const ground = new THREE.Mesh(
-    groundGeometry,
-    [
-        sideGroundMaterial,
-        sideGroundMaterial,
-        sideGroundMaterial,
-        sideGroundMaterial,
-        groundMaterial,
-        groundMaterial,
-    ]
-)
-ground.rotation.x = - Math.PI / 2;
-ground.position.y = -0.5
-ground.receiveShadow = true;
-ground.matrixAutoUpdate = false
-ground.updateMatrix();
-scene.add(ground)
-
-const groundCollisioner = new THREE.Mesh(
-    new THREE.PlaneGeometry(mazeLength, mazeWidth)
-)
-groundCollisioner.rotation.x = - Math.PI / 2;
-worldOctree.fromGraphNode(groundCollisioner)
 
 //
 
@@ -677,6 +675,8 @@ function updateSun() {
 
     sky.material.uniforms['sunPosition'].value.copy(sun);
     ocean.material.uniforms['sunDirection'].value.copy(sun).normalize();
+    
+    sunLight.position.copy(sun)
 
     ambientLight.intensity = 0.5 + Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
 
@@ -717,8 +717,6 @@ function animate() {
 
     if (camera.position.y > 3.5)
         camera.lookAt(raft.position.x, raft.position.y, raft.position.z);
-
-    sunLight.position.copy(sun).add(camera.position)
 
     ocean.material.uniforms['time'].value += delta;
     updateRaft(delta);
