@@ -12,7 +12,6 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 import MazeMesh from './MazeMesh.js';
 
-const mazeLength = 23
 const mazeWidth = 23
 
 const parameters = {
@@ -80,7 +79,7 @@ const wallMaterial = new THREE.MeshPhongMaterial({
     depthWrite: true
 })
 
-const maze = new MazeMesh(mazeLength, mazeWidth, wallMaterial);
+const maze = new MazeMesh(mazeWidth, mazeWidth, wallMaterial);
 maze.castShadow = true;
 maze.receiveShadow = true;
 maze.matrixAutoUpdate = false
@@ -103,10 +102,10 @@ const pavementTexture = loader.load(
     'img/pavement.jpg',
     texture => {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(mazeLength / 2, mazeWidth / 2)
+        texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
     }
 );
-const groundGeometry = new THREE.BoxGeometry(mazeLength, mazeWidth, 1)
+const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 1)
 const groundMaterial = new THREE.MeshPhongMaterial({
     map: pavementTexture,
     color: 0xFFFFFF,
@@ -121,7 +120,7 @@ const groundMaterial = new THREE.MeshPhongMaterial({
 })
 const sideGroundTexture = wallTexture.clone()
 sideGroundTexture.wrapS = sideGroundTexture.wrapT = THREE.RepeatWrapping
-sideGroundTexture.repeat.set(mazeLength, 1)
+sideGroundTexture.repeat.set(mazeWidth, 1)
 const sideGroundMaterial = new THREE.MeshPhongMaterial({
     map: sideGroundTexture,
     color: 0xFCF8E5,
@@ -153,7 +152,7 @@ ground.updateMatrix();
 scene.add(ground)
 
 const groundCollisioner = new THREE.Mesh(
-    new THREE.PlaneGeometry(mazeLength, mazeWidth)
+    new THREE.PlaneGeometry(mazeWidth, mazeWidth)
 )
 groundCollisioner.rotation.x = - Math.PI / 2;
 worldOctree.fromGraphNode(groundCollisioner)
@@ -243,12 +242,12 @@ const sunLight = new THREE.DirectionalLight(0xffffff, 0.3);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 50;
 sunLight.shadow.camera.far     = 300;
-sunLight.shadow.camera.left    = -1.4 * mazeLength/2;
-sunLight.shadow.camera.right   =  1.4 * mazeLength/2;
+sunLight.shadow.camera.left    = -1.4 * mazeWidth/2;
+sunLight.shadow.camera.right   =  1.4 * mazeWidth/2;
 sunLight.shadow.camera.bottom  = -1.4 * mazeWidth/2;
 sunLight.shadow.camera.top     =  1.4 * mazeWidth/2;
-sunLight.shadow.mapSize.width  = 4096;
-sunLight.shadow.mapSize.height = 4096;
+sunLight.shadow.mapSize.width  = 8192;
+sunLight.shadow.mapSize.height = 8192;
 sunLight.shadow.radius         = 4;
 sunLight.target                = maze
 scene.add(sunLight);
