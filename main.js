@@ -54,18 +54,18 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 container.appendChild(renderer.domElement);
 
-const scene = new THREE.Scene();
+const scene     = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 25, 0);
 
 const worldOctree = new Octree();
-const raftOctree = new Octree();
+const raftOctree  = new Octree();
 
 // Maze
 
-const wallTexture = loader.load('img/wall.jpg');
+const wallTexture  = loader.load('img/wall.jpg');
 const wallMaterial = new THREE.MeshPhongMaterial({
     map: wallTexture,
     color: 0xFCF8E5,
@@ -73,7 +73,7 @@ const wallMaterial = new THREE.MeshPhongMaterial({
     specular: 0x505050,
     shininess: 4,
     bumpMap: wallTexture,
-    bumpScale: .01,
+    bumpScale: .005,
     depthFunc: 3,
     depthTest: true,
     depthWrite: true
