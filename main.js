@@ -58,7 +58,7 @@ const scene     = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
-camera.position.set(0, 25, 0);
+camera.position.set(0, 25, 0.7);
 
 const worldOctree = new Octree();
 const raftOctree  = new Octree();
@@ -719,6 +719,7 @@ function animate() {
 
     ocean.material.uniforms['time'].value += delta;
     updateRaft(delta);
+    if (escaped) camera.position.y = raft.position.y + 0.6;
 
     renderer.render(scene, camera);
 
