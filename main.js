@@ -54,11 +54,10 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 container.appendChild(renderer.domElement);
 
-const scene     = new THREE.Scene();
+const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
-camera.position.set(0, 25, 0.7);
 
 const worldOctree = new Octree();
 const raftOctree  = new Octree();
@@ -273,7 +272,7 @@ const raftMaterial = new THREE.MeshPhongMaterial({
     displacementScale: -0.08
 })
 const raft = new THREE.Mesh(raftGeometry, raftMaterial)
-raft.position.set(.2, ocean.position.y, -1 - mazeWidth / 2)
+raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
 raft.rotation.y = 1.4
 raft.castShadow = true;
 worldOctree.fromGraphNode(raft)
@@ -421,7 +420,7 @@ const GRAVITY = 30;
 const STEPS_PER_FRAME = 5;
 
 const playerCollider = new Capsule(
-    new THREE.Vector3(0, 25, 0),
+    new THREE.Vector3(0, 25.0, 0),
     new THREE.Vector3(0, 25.5, 0),
     0.3
 );
@@ -504,14 +503,10 @@ function gameEnd() {
     message.className = "escaped";
     piano.play();
 
-}
-
-addEventListener("animationend", (event) => {
-
     document.exitPointerLock();
     container.style.cursor = "default";
 
-});
+}
 
 function updatePlayer(deltaTime) {
 
@@ -719,7 +714,7 @@ function animate() {
 
     ocean.material.uniforms['time'].value += delta;
     updateRaft(delta);
-    if (escaped) camera.position.y = raft.position.y + 0.6;
+    if (escaped) camera.position.y = raft.position.y + 0.9;
 
     renderer.render(scene, camera);
 
