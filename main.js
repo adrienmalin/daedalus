@@ -471,9 +471,12 @@ document.addEventListener('keyup', (event) => {
 
 function playerCollisions() {
 
-    if (!escaped && raftOctree.capsuleIntersect(playerCollider)) {
+    if (raftOctree.capsuleIntersect(playerCollider)) {
 
-        gameEnd()
+        
+        camera.position.y = raft.position.y + 0.9;
+
+        if (!escaped) gameEnd()
 
     }
 
@@ -696,6 +699,9 @@ function animate() {
     const delta = Math.min(0.05, clock.getDelta())
     const deltaTime = delta / STEPS_PER_FRAME;
 
+    ocean.material.uniforms['time'].value += delta;
+    updateRaft(delta);
+
     // we look for collisions in substeps to mitigate the risk of
     // an object traversing another too quickly for detection.
 
@@ -711,10 +717,6 @@ function animate() {
 
     if (camera.position.y > 3.5)
         camera.lookAt(raft.position.x, raft.position.y, raft.position.z);
-
-    ocean.material.uniforms['time'].value += delta;
-    updateRaft(delta);
-    if (escaped) camera.position.y = raft.position.y + 0.9;
 
     renderer.render(scene, camera);
 
