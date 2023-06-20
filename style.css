@@ -30,21 +30,28 @@ body {
   position: absolute;
   left: 0;
   width: 100%;
-  font-size: 10vh;
   font-family: Georgia, serif;
   background: transparent;
   justify-content: center;
   z-index: 1;
+  color: gray;
+}
+
+#message.loading {
+  display: flex;
+  top: 30vh;
+  font-size: 4vh;
 }
 
 #message a {
-  color: gray;
   text-decoration: none;
+  color: inherit;
 }
 
 #message.escaped {
   display: flex;
   opacity: 100%;
+  font-size: 10vh;
   top: 30vh;
   animation: escaped 5s;
 }

@@ -35,7 +35,18 @@ piano.loop = false
 
 const loadMngr = new THREE.LoadingManager();
 const loader = new THREE.TextureLoader(loadMngr);
+loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
+    message.innerHTML = 'Chargement : 0%...'
+}
+loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
+    message.innerHTML = 'Chargement : ' + 100 * itemsLoaded / itemsTotal + '%...'
+}
+loadMngr.onError = function (url) {
+    message.innerHTML = 'Erreur de chargement'
+}
 loadMngr.onLoad = () => {
+    message.innerHTML = ""
+    message.className = ""
     animate();
 };
 
@@ -503,6 +514,7 @@ function playerCollisions() {
 function gameEnd() {
 
     escaped = true;
+    message.innerHTML = '<a href="" title="Rejouer">Libre !</a>';
     message.className = "escaped";
     piano.play();
 
