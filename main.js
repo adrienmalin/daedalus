@@ -47,7 +47,8 @@ loadMngr.onError = function (url) {
 loadMngr.onLoad = () => {
     message.innerHTML = ""
     message.className = ""
-    animate();
+
+    renderer.setAnimationLoop(animate)
 };
 
 //
@@ -64,8 +65,6 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.physicallyCorrectLights = true;
-
-renderer.setAnimationLoop(animate)
 
 container.appendChild(renderer.domElement);
 
