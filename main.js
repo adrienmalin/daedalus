@@ -64,6 +64,9 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.physicallyCorrectLights = true;
+
+renderer.setAnimationLoop(animate)
+
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -706,8 +709,6 @@ function onWindowResize() {
 }
 
 function animate() {
-
-    requestAnimationFrame(animate);
 
     const delta = Math.min(0.05, clock.getDelta())
     const deltaTime = delta / STEPS_PER_FRAME;
