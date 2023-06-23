@@ -63,6 +63,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.physicallyCorrectLights = true;
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -245,7 +246,7 @@ const pmremGenerator = new THREE.PMREMGenerator(renderer);
 
 // Lights
 
-const ambientLight = new THREE.AmbientLight(0x404040, 1); // soft white light
+const ambientLight = new THREE.AmbientLight(0x888888, 1); // soft white light
 scene.add(ambientLight);
 
 const sunLight = new THREE.DirectionalLight(0xffffff, 0.3);
