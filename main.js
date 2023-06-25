@@ -447,6 +447,7 @@ let jumping = false;
 let escaped = false;
 
 const pointerLockControls = new PointerLockControls(camera, document.body);
+pointerLockControls.pointerSpeed = 0.7;
 
 container.addEventListener('click', function () {
 
