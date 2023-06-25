@@ -487,7 +487,6 @@ function playerCollisions() {
 
     if (raftOctree.capsuleIntersect(playerCollider)) {
 
-        
         camera.position.y = raft.position.y + 0.9;
 
         if (!escaped) gameEnd()
@@ -623,6 +622,7 @@ function teleportPlayerIfOob() {
         camera.position.copy(playerCollider.end);
         camera.rotation.set(0, 0, 0);
         message.className = ""
+        escaped = false;
 
     }
 
