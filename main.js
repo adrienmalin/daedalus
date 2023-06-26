@@ -39,7 +39,7 @@ loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
     message.innerHTML = 'Chargement : 0%...'
 }
 loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
-    message.innerHTML = 'Chargement : ' + 100 * itemsLoaded / itemsTotal + '%...'
+    message.innerHTML = 'Chargement : ' + Math.floor(100 * itemsLoaded / itemsTotal) + '%...'
 }
 loadMngr.onError = function (url) {
     message.innerHTML = 'Erreur de chargement'
@@ -79,17 +79,13 @@ const raftOctree  = new Octree();
 // Maze
 
 const wallTexture  = loader.load('img/wall.jpg');
-const wallMaterial = new THREE.MeshPhongMaterial({
-    map: wallTexture,
-    color: 0xFCF8E5,
-    emissive: 0,
-    specular: 0x505050,
-    shininess: 4,
-    bumpMap: wallTexture,
-    bumpScale: .005,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true
+const wallMaterial = new THREE.MeshStandardMaterial({
+    map: loader.load('img/stonewall-albedo.png'),
+    normalMap: loader.load('img/stonewall-normal.png'),
+    metalnessMap: loader.load('img/stonewall-metalness.png'),
+    aoMap: loader.load('img/stonewall-ao.png'),
+    roughnessMap: loader.load('img/stonewall-roughness.png'),
+
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, wallMaterial);
@@ -112,7 +108,7 @@ for (let i = 0; i < maze.count; i++) {
 // Ground
 
 const pavementTexture = loader.load(
-    'img/pavement.jpg',
+    'img/angled-blocks-vegetation_albedo.png',
     texture => {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping
         texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
@@ -120,32 +116,59 @@ const pavementTexture = loader.load(
 );
 const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 1)
 const groundMaterial = new THREE.MeshPhongMaterial({
-    map: pavementTexture,
-    color: 0xFFFFFF,
-    emissive: 0,
-    specular: 0x000000,
-    shininess: 5,
-    bumpMap: pavementTexture,
-    bumpScale: .02,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true
+    map: loader.load(
+        'img/angled-blocks-vegetation_albedo.png',
+        texture => {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+        }
+    ),
+    aoMap: loader.load(
+        'img/angled-blocks-vegetation_ao.png',
+        texture => {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+        }
+    ),
+    metalnessMap: loader.load(
+        'img/angled-blocks-vegetation_metallic.png',
+        texture => {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+        }
+    ),
+    normalMap: loader.load(
+        'img/angled-blocks-vegetation_normal-dx.png',
+        texture => {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+        }
+    ),
+    roughnessMap: loader.load(
+        'img/angled-blocks-vegetation_roughness.png',
+        texture => {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+        }
+    )
 })
-const sideGroundTexture = wallTexture.clone()
-sideGroundTexture.wrapS = sideGroundTexture.wrapT = THREE.RepeatWrapping
-sideGroundTexture.repeat.set(mazeWidth, 1)
-const sideGroundMaterial = new THREE.MeshPhongMaterial({
-    map: sideGroundTexture,
-    color: 0xFCF8E5,
-    emissive: 0,
-    specular: 0x505050,
-    shininess: 4,
-    bumpMap: sideGroundTexture,
-    bumpScale: .01,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true
-})
+const sideGroundMaterial = new THREE.MeshStandardMaterial()
+sideGroundMaterial.map = wallMaterial.map.clone()
+sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.map.repeat.set(mazeWidth, 1)
+sideGroundMaterial.normalMap = wallMaterial.normalMap.clone()
+sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.metalnessMap = wallMaterial.map.clone()
+sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.aoMap = wallMaterial.map.clone()
+sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.roughnessMap = wallMaterial.map.clone()
+sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 1)
+
 const ground = new THREE.Mesh(
     groundGeometry,
     [
@@ -244,14 +267,14 @@ skyUniforms['rayleigh'].value = 2;
 skyUniforms['mieCoefficient'].value = 0.005;
 skyUniforms['mieDirectionalG'].value = 0.8;
 
-const pmremGenerator = new THREE.PMREMGenerator(renderer);
+//const pmremGenerator = new THREE.PMREMGenerator(renderer);
 
 // Lights
 
-const ambientLight = new THREE.AmbientLight(0x888888, 1); // soft white light
+const ambientLight = new THREE.AmbientLight(0x404040, 6);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 0.3);
+const sunLight = new THREE.DirectionalLight(0xffffff, 2);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 50;
 sunLight.shadow.camera.far     = 300;
@@ -267,12 +290,32 @@ scene.add(sunLight);
 
 updateSun();
 
+function updateSun() {
+
+    const phi = THREE.MathUtils.degToRad(90 - parameters.elevation);
+    const theta = THREE.MathUtils.degToRad(parameters.azimuth);
+
+    sun.setFromSphericalCoords(100, phi, theta);
+
+    sky.material.uniforms['sunPosition'].value.copy(sun);
+    ocean.material.uniforms['sunDirection'].value.copy(sun).normalize();
+    
+    sunLight.position.copy(sun)
+
+    ambientLight.intensity = 2 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
+
+    //scene.environment = pmremGenerator.fromScene(sky).texture;
+
+}
+
 // Raft
 
 const raftGeometry = new THREE.BoxGeometry(1.8, .1, .9, 1, 1, 8)
 const woodTexture = loader.load('img/wood.jpg');
 const raftMaterial = new THREE.MeshPhongMaterial({
     map: woodTexture,
+    aoMap: woodTexture,
+    roughnessMap: woodTexture,
     color: 0xFFFFFF,
     emissive: 0,
     specular: 0x505050,
@@ -676,24 +719,6 @@ function updateRaft(delta) {
         new THREE.Euler().setFromVector3(waveInfo.normal)
     );
     raft.quaternion.rotateTowards(quat, delta * 0.5);
-
-}
-
-function updateSun() {
-
-    const phi = THREE.MathUtils.degToRad(90 - parameters.elevation);
-    const theta = THREE.MathUtils.degToRad(parameters.azimuth);
-
-    sun.setFromSphericalCoords(100, phi, theta);
-
-    sky.material.uniforms['sunPosition'].value.copy(sun);
-    ocean.material.uniforms['sunDirection'].value.copy(sun).normalize();
-    
-    sunLight.position.copy(sun)
-
-    ambientLight.intensity = 0.5 + Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
-
-    scene.environment = pmremGenerator.fromScene(sky).texture;
 
 }
 
