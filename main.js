@@ -16,7 +16,7 @@ const mazeWidth = 23
 
 const parameters = {
     elevation: 90 * Math.random(),
-    azimuth: 180 * Math.random(),
+    azimuth: -160,
 };
 
 const waves = {
@@ -107,48 +107,41 @@ for (let i = 0; i < maze.count; i++) {
 
 // Ground
 
-const pavementTexture = loader.load(
-    'img/angled-blocks-vegetation_albedo.png',
-    texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
-    }
-);
 const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 1)
 const groundMaterial = new THREE.MeshPhongMaterial({
     map: loader.load(
         'img/angled-blocks-vegetation_albedo.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     aoMap: loader.load(
         'img/angled-blocks-vegetation_ao.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     metalnessMap: loader.load(
         'img/angled-blocks-vegetation_metallic.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     normalMap: loader.load(
         'img/angled-blocks-vegetation_normal-dx.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     roughnessMap: loader.load(
         'img/angled-blocks-vegetation_roughness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     )
 })
@@ -271,7 +264,7 @@ skyUniforms['mieDirectionalG'].value = 0.8;
 
 // Lights
 
-const ambientLight = new THREE.AmbientLight(0x404040, 6);
+const ambientLight = new THREE.AmbientLight(0x222222, 9);
 scene.add(ambientLight);
 
 const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -302,7 +295,7 @@ function updateSun() {
     
     sunLight.position.copy(sun)
 
-    ambientLight.intensity = 2 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
+    ambientLight.intensity = 5 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
 
     //scene.environment = pmremGenerator.fromScene(sky).texture;
 
