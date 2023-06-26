@@ -274,7 +274,7 @@ skyUniforms['mieDirectionalG'].value = 0.8;
 const ambientLight = new THREE.AmbientLight(0x404040, 6);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 2);
+const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 50;
 sunLight.shadow.camera.far     = 300;
@@ -310,7 +310,7 @@ function updateSun() {
 
 // Raft
 
-const raftGeometry = new THREE.BoxGeometry(1.8, .1, .9, 1, 1, 8)
+const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 8)
 const woodTexture = loader.load('img/wood.jpg');
 const raftMaterial = new THREE.MeshPhongMaterial({
     map: woodTexture,
