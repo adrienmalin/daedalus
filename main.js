@@ -74,8 +74,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 
-const worldOctree = new Octree();
-const raftOctree  = new Octree();
+const collisionner = new THREE.Group();
 
 // Maze
 
@@ -96,13 +95,14 @@ scene.add(maze)
 console.log(String(maze))
 
 const invisibleWall = new THREE.Mesh(new THREE.BoxGeometry( .9, 1.8, .9 ));
+invisibleWall.material.visible = false;
 let matrix = new THREE.Matrix4()
 for (let i = 0; i < maze.count; i++) {
     maze.getMatrixAt(i, matrix)
     const clone = invisibleWall.clone()
-    clone.position.setFromMatrixPosition(matrix)
-    clone.position.y += 0.5;
-    worldOctree.fromGraphNode(clone)
+    clone.position.setFromMatrixPosition(matrix);
+    clone.position.y = 1;
+    collisionner.add(clone);
 }
 
 // Ground
@@ -178,9 +178,8 @@ ground.position.y = -0.5
 ground.receiveShadow = true;
 ground.matrixAutoUpdate = false
 ground.updateMatrix();
-scene.add(ground)
 
-worldOctree.fromGraphNode(ground)
+collisionner.add(ground)
 
 // Water
 
@@ -342,9 +341,15 @@ const raft = new THREE.Mesh(raftGeometry, [
 raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
 raft.rotation.y = 1.4
 raft.castShadow = true;
-worldOctree.fromGraphNode(raft)
+collisionner.add(raft);
+const raftOctree  = new Octree();
 raftOctree.fromGraphNode(raft)
 scene.add(raft)
+
+scene.add(collisionner);
+
+const worldOctree = new Octree();
+worldOctree.fromGraphNode(collisionner);
 
 //
 
@@ -368,7 +373,7 @@ if (showParam) {
     showHelper.onChange(function (value) {
 
         lightHelper.visible = value;
-        //octreeHelper.visible = value;
+        octreeHelper.visible = value;
 
     });
 
@@ -484,7 +489,7 @@ const clock = new THREE.Clock();
 
 const GRAVITY = 30;
 
-const STEPS_PER_FRAME = 5;
+const STEPS_PER_FRAME = 10;
 
 const playerCollider = new Capsule(
     new THREE.Vector3(0, 25.0, 0),
@@ -627,7 +632,7 @@ function getSideVector() {
 function controls(deltaTime) {
 
     // gives a bit of air control
-    const speedDelta = deltaTime * (playerOnFloor ? 10 : 2);
+    const speedDelta = deltaTime * (playerOnFloor ? 100 : 20) / STEPS_PER_FRAME;
 
     if (keyStates["ArrowUp"] || keyStates['KeyW']) {
 
