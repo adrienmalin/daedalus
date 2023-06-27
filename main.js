@@ -305,7 +305,7 @@ function updateSun() {
 
 const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 8)
 const woodTexture = loader.load('img/wood.jpg');
-const raftMaterial = new THREE.MeshPhongMaterial({
+const raftFaceMaterial = new THREE.MeshPhysicalMaterial({
     map: woodTexture,
     aoMap: woodTexture,
     roughnessMap: woodTexture,
@@ -321,7 +321,28 @@ const raftMaterial = new THREE.MeshPhongMaterial({
     displacementMap: woodTexture,
     displacementScale: -0.08
 })
-const raft = new THREE.Mesh(raftGeometry, raftMaterial)
+const raftSideMaterial = new THREE.MeshPhysicalMaterial({
+    map: woodTexture,
+    aoMap: woodTexture,
+    roughnessMap: woodTexture,
+    color: 0xFFFFFF,
+    emissive: 0,
+    specular: 0x505050,
+    shininess: 1,
+    bumpMap: woodTexture,
+    bumpScale: .1,
+    depthFunc: 3,
+    depthTest: true,
+    depthWrite: true,
+})
+const raft = new THREE.Mesh(raftGeometry, [
+    raftSideMaterial,
+    raftSideMaterial,
+    raftFaceMaterial,
+    raftSideMaterial,
+    raftSideMaterial,
+    raftFaceMaterial,
+])
 raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
 raft.rotation.y = 1.4
 raft.castShadow = true;
