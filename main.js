@@ -64,7 +64,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 //renderer.toneMappingExposure = 0.5;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.physicallyCorrectLights = true;
 
 container.appendChild(renderer.domElement);
@@ -259,20 +259,21 @@ skyUniforms['mieDirectionalG'].value = 0.8;
 
 // Lights
 
-const ambientLight = new THREE.AmbientLight(0x222222, 9);
+const ambientLight = new THREE.AmbientLight(0x404040, 9);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xfffae8, 1.5);
+const sunLight = new THREE.DirectionalLight(0xfffae8, 1);
 sunLight.castShadow            = true;
-sunLight.shadow.camera.near    = 50;
-sunLight.shadow.camera.far     = 300;
+sunLight.shadow.camera.near    = 0.1;
+sunLight.shadow.camera.far     =  1.4 * mazeWidth;
 sunLight.shadow.camera.left    = -1.4 * mazeWidth/2;
 sunLight.shadow.camera.right   =  1.4 * mazeWidth/2;
 sunLight.shadow.camera.bottom  = -1.4 * mazeWidth/2;
 sunLight.shadow.camera.top     =  1.4 * mazeWidth/2;
-sunLight.shadow.mapSize.width  = 8192;
-sunLight.shadow.mapSize.height = 8192;
-sunLight.shadow.radius         = 4;
+sunLight.shadow.mapSize.width  = 1024;
+sunLight.shadow.mapSize.height = 1024;
+//sunLight.shadow.radius         = 0.01;
+sunLight.shadow.bias           = 0.0001;
 sunLight.target                = maze
 scene.add(sunLight);
 
@@ -283,7 +284,7 @@ function updateSun() {
     const phi = THREE.MathUtils.degToRad(90 - parameters.elevation);
     const theta = THREE.MathUtils.degToRad(parameters.azimuth);
 
-    sun.setFromSphericalCoords(100, phi, theta);
+    sun.setFromSphericalCoords(1.4 * mazeWidth/2, phi, theta);
 
     sky.material.uniforms['sunPosition'].value.copy(sun);
     ocean.material.uniforms['sunDirection'].value.copy(sun).normalize();
