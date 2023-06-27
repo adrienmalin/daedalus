@@ -15,7 +15,7 @@ import MazeMesh from './MazeMesh.js';
 const mazeWidth = 23
 
 const parameters = {
-    elevation: 90 * Math.random(),
+    elevation: 1 + 89 * Math.random(),
     azimuth: -160,
 };
 
@@ -87,7 +87,7 @@ const wallMaterial = new THREE.MeshStandardMaterial({
     roughnessMap: loader.load('img/stonewall-roughness.png'),
 })
 
-const maze = new MazeMesh(mazeWidth, mazeWidth, wallMaterial);
+const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
 maze.castShadow = true;
 maze.receiveShadow = true;
 maze.matrixAutoUpdate = false
@@ -95,12 +95,13 @@ scene.add(maze)
 
 console.log(String(maze))
 
-const wall = new THREE.Mesh(maze.geometry);
+const invisibleWall = new THREE.Mesh(new THREE.BoxGeometry( .9, 1.8, .9 ));
 let matrix = new THREE.Matrix4()
 for (let i = 0; i < maze.count; i++) {
     maze.getMatrixAt(i, matrix)
-    const clone = wall.clone()
+    const clone = invisibleWall.clone()
     clone.position.setFromMatrixPosition(matrix)
+    clone.position.y += 0.5;
     worldOctree.fromGraphNode(clone)
 }
 
@@ -179,11 +180,7 @@ ground.matrixAutoUpdate = false
 ground.updateMatrix();
 scene.add(ground)
 
-const groundCollisioner = new THREE.Mesh(
-    new THREE.PlaneGeometry(mazeWidth, mazeWidth)
-)
-groundCollisioner.rotation.x = - Math.PI / 2;
-worldOctree.fromGraphNode(groundCollisioner)
+worldOctree.fromGraphNode(ground)
 
 // Water
 

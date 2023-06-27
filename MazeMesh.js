@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 
-const mazeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-
 export default class MazeMesh extends THREE.InstancedMesh {
-    constructor( width, length, material ) {
-        super( mazeGeometry, material, width*length - 2 );
+    constructor( width, length, height, material ) {
+        super( 
+            new THREE.BoxGeometry( 1, height, 1 ),
+            material,
+            width*length - 2
+        );
         this.length = length
         this.width = width
         this.map = new Array(length).fill().map(() => new Array(width).fill(1))
