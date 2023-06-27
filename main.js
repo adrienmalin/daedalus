@@ -108,7 +108,7 @@ for (let i = 0; i < maze.count; i++) {
 // Ground
 
 const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 1)
-const groundMaterial = new THREE.MeshPhongMaterial({
+const groundMaterial = new THREE.MeshStandardMaterial({
     map: loader.load(
         'img/angled-blocks-vegetation_albedo.png',
         texture => {
