@@ -62,6 +62,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
+//renderer.toneMappingExposure = 0.5;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.physicallyCorrectLights = true;
@@ -78,14 +79,12 @@ const raftOctree  = new Octree();
 
 // Maze
 
-const wallTexture  = loader.load('img/wall.jpg');
 const wallMaterial = new THREE.MeshStandardMaterial({
     map: loader.load('img/stonewall-albedo.png'),
     normalMap: loader.load('img/stonewall-normal.png'),
     metalnessMap: loader.load('img/stonewall-metalness.png'),
     aoMap: loader.load('img/stonewall-ao.png'),
     roughnessMap: loader.load('img/stonewall-roughness.png'),
-
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, wallMaterial);
@@ -143,7 +142,7 @@ const groundMaterial = new THREE.MeshPhongMaterial({
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
-    )
+    ),
 })
 const sideGroundMaterial = new THREE.MeshStandardMaterial()
 sideGroundMaterial.map = wallMaterial.map.clone()
@@ -267,7 +266,7 @@ skyUniforms['mieDirectionalG'].value = 0.8;
 const ambientLight = new THREE.AmbientLight(0x222222, 9);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+const sunLight = new THREE.DirectionalLight(0xfffae8, 1.5);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 50;
 sunLight.shadow.camera.far     = 300;
@@ -305,7 +304,7 @@ function updateSun() {
 
 const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 8)
 const woodTexture = loader.load('img/wood.jpg');
-const raftFaceMaterial = new THREE.MeshPhysicalMaterial({
+const raftFaceMaterial = new THREE.MeshStandardMaterial({
     map: woodTexture,
     aoMap: woodTexture,
     roughnessMap: woodTexture,
@@ -321,7 +320,7 @@ const raftFaceMaterial = new THREE.MeshPhysicalMaterial({
     displacementMap: woodTexture,
     displacementScale: -0.08
 })
-const raftSideMaterial = new THREE.MeshPhysicalMaterial({
+const raftSideMaterial = new THREE.MeshStandardMaterial({
     map: woodTexture,
     aoMap: woodTexture,
     roughnessMap: woodTexture,
