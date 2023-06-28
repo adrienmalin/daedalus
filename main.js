@@ -16,11 +16,11 @@ const mazeWidth = 23
 
 const parameters = {
     elevation: 48,
-    azimuth: 53,
+    azimuth  : 53,
 };
 
 const waves = {
-    A: { direction: 0, steepness: 0.05, wavelength: 3 },
+    A: { direction:  0, steepness: 0.05, wavelength: 3 },
     B: { direction: 30, steepness: 0.10, wavelength: 6 },
     C: { direction: 60, steepness: 0.05, wavelength: 1.5 },
 };
@@ -186,7 +186,7 @@ const ground = new THREE.Mesh(
         groundMaterial,
     ]
 )
-ground.rotation.x = - Math.PI / 2;
+ground.rotation.x = -Math.PI / 2;
 ground.position.y = -0.5
 ground.receiveShadow = true;
 ground.matrixAutoUpdate = false
@@ -199,20 +199,20 @@ collisionner.add(ground)
 const waterGeometry = new THREE.PlaneGeometry(2048, 2048, 512, 512);
 
 const ocean = new Water(waterGeometry, {
-    textureWidth: 512,
+    textureWidth : 512,
     textureHeight: 512,
-    waterNormals: loader.load(
+    waterNormals : loader.load(
         'textures/waternormals.jpg',
         function (texture) {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }
     ),
-    sunDirection: new THREE.Vector3(),
-    sunColor: 0xffffff,
-    waterColor: 0x001e0f,
+    sunDirection   : new THREE.Vector3(),
+    sunColor       : 0xffffff,
+    waterColor     : 0x001e0f,
     distortionScale: 3.7,
-    fog: scene.fog !== undefined,
-    alpha: 0.9
+    fog            : scene.fog !== undefined,
+    alpha          : 0.9
 });
 ocean.rotation.x = - Math.PI / 2;
 ocean.position.y = -0.2;
