@@ -167,13 +167,13 @@ sideGroundMaterial.map.repeat.set(mazeWidth, 1)
 sideGroundMaterial.normalMap = wallMaterial.normalMap.clone()
 sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.metalnessMap = wallMaterial.map.clone()
+sideGroundMaterial.metalnessMap = wallMaterial.metalnessMap.clone()
 sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.aoMap = wallMaterial.map.clone()
+sideGroundMaterial.aoMap = wallMaterial.aoMap.clone()
 sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.roughnessMap = wallMaterial.map.clone()
+sideGroundMaterial.roughnessMap = wallMaterial.roughnessMap.clone()
 sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 1)
 
