@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 
 import { Octree } from 'three/addons/math/Octree.js';
@@ -66,6 +65,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.physicallyCorrectLights = true;
+renderer.outputEncoding = THREE.sRGBEncoding;
 
 container.appendChild(renderer.domElement);
 
@@ -81,8 +81,10 @@ scene.background = new THREE.CubeTextureLoader()
         'rt.jpg',
         'lf.jpg',
     ] );
+scene.backgroundBlurriness = 0.03;
+scene.environment = scene.background;
 
-window.scene = scene
+window.scene = scene;
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
@@ -94,10 +96,12 @@ const collisionner = new THREE.Group();
 const wallMaterial = new THREE.MeshStandardMaterial({
     map         : loader.load('textures/stonewall/albedo.png'),
     normalMap   : loader.load('textures/stonewall/normal.png'),
+	normalScale : new THREE.Vector2(0.6, 0.6),
     metalnessMap: loader.load('textures/stonewall/metalness.png'),
     aoMap       : loader.load('textures/stonewall/ao.png'),
     roughnessMap: loader.load('textures/stonewall/roughness.png'),
-    envMap      : scene.background
+	roughness   : 1,
+	envMapIntensity: 0.2
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -158,7 +162,6 @@ const groundMaterial = new THREE.MeshStandardMaterial({
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
-    envMap: scene.background
 })
 const sideGroundMaterial = groundMaterial.clone()
 sideGroundMaterial.map = wallMaterial.map.clone()
@@ -259,10 +262,10 @@ scene.add(ocean);
 
 const sun = new THREE.Vector3();
 
-const ambientLight = new THREE.AmbientLight(0x404040, 7);
-scene.add(ambientLight);
+//const ambientLight = new THREE.AmbientLight(0x404040, 7);
+//scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xfffae8, 0.5);
+const sunLight = new THREE.DirectionalLight(0xfffae8, 2);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 0.1;
 sunLight.shadow.camera.far     =  1.4 * mazeWidth;
@@ -289,7 +292,7 @@ function updateSun() {
     
     sunLight.position.copy(sun)
 
-    ambientLight.intensity = 5 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
+    //ambientLight.intensity = 5 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
 
 }
 
@@ -332,7 +335,7 @@ const raft = new THREE.Mesh(raftGeometry, [
     raftSideMaterial,
     raftFaceMaterial,
     raftSideMaterial,
-    raftSideMaterial,
+    raftFaceMaterial,
     raftFaceMaterial,
 ])
 raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
