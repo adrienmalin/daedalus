@@ -338,10 +338,10 @@ const raft = new THREE.Mesh(raftGeometry, [
 raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
 raft.rotation.y = 1.4
 raft.castShadow = true;
+
 collisionner.add(raft);
 const raftOctree  = new Octree();
 raftOctree.fromGraphNode(raft)
-scene.add(raft)
 
 scene.add(collisionner);
 
