@@ -35,10 +35,13 @@ piano.loop = false
 const loadMngr = new THREE.LoadingManager();
 const loader = new THREE.TextureLoader(loadMngr);
 loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
-    message.innerHTML = 'Chargement : 0%...'
+	progressCircle.setAttribute("data-progress", 0)
+	progressCircle.style.setProperty("--progress", "0deg")
+	
 }
 loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
-    message.innerHTML = 'Chargement : ' + Math.floor(100 * itemsLoaded / itemsTotal) + '%...'
+	progressCircle.setAttribute("data-progress", Math.floor(100 * itemsLoaded / itemsTotal))
+	progressCircle.style.setProperty("--progress", Math.floor(360 * itemsLoaded / itemsTotal)+"deg")
 }
 loadMngr.onError = function (url) {
     message.innerHTML = 'Erreur de chargement'
@@ -101,7 +104,7 @@ const wallMaterial = new THREE.MeshStandardMaterial({
     aoMap       : loader.load('textures/stonewall/ao.png'),
     roughnessMap: loader.load('textures/stonewall/roughness.png'),
 	roughness   : 1,
-	envMapIntensity: 0.2
+	envMapIntensity: 0.1
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);

@@ -40,7 +40,31 @@ body {
 #message.loading {
   display: flex;
   top: 30vh;
-  font-size: 4vh;
+}
+
+#message.loading div {
+  display: flex;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(#1da8b7 var(--progress), dimgray 0deg);
+  font-size: 0;
+}
+
+#message.loading div::after {
+  content: attr(data-progress) '%';
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  margin: 4px;
+  border-radius: 50%;
+  color: white;
+  background: black;
+  font-size: 3vh;
+  font-weight: 400;
+  font-family: system-ui;
+  text-align: center;
 }
 
 #message a {
