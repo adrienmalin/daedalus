@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
 import { Water } from 'three/addons/objects/Water.js';
-import { Sky } from 'three/addons/objects/Sky.js';
+// import { Sky } from 'three/addons/objects/Sky.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
@@ -160,21 +160,21 @@ const groundMaterial = new THREE.MeshStandardMaterial({
     ),
     envMap: scene.background
 })
-const sideGroundMaterial = new THREE.MeshStandardMaterial()
+const sideGroundMaterial = groundMaterial.clone()
 sideGroundMaterial.map = wallMaterial.map.clone()
-sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.map.repeat.set(mazeWidth, 1)
 sideGroundMaterial.normalMap = wallMaterial.normalMap.clone()
-sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.metalnessMap = wallMaterial.metalnessMap.clone()
-sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.aoMap = wallMaterial.aoMap.clone()
-sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.roughnessMap = wallMaterial.roughnessMap.clone()
+sideGroundMaterial.aoMap = wallMaterial.aoMap.clone()
+sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.metalnessMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.map.repeat.set(mazeWidth, 1)
+sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 1)
 
 const ground = new THREE.Mesh(
@@ -198,7 +198,7 @@ collisionner.add(ground)
 
 // Water
 
-const waterGeometry = new THREE.PlaneGeometry(2048, 2048, 512, 512);
+const waterGeometry = new THREE.PlaneGeometry(1024, 1024, 512, 512);
 
 const ocean = new Water(waterGeometry, {
     textureWidth : 512,
@@ -255,11 +255,9 @@ ocean.material.onBeforeCompile = function (shader) {
 
 scene.add(ocean);
 
-// Skybox
+// Lights
 
 const sun = new THREE.Vector3();
-
-// Lights
 
 const ambientLight = new THREE.AmbientLight(0x404040, 7);
 scene.add(ambientLight);
