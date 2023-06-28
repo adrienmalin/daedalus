@@ -42,7 +42,7 @@ body {
   top: 30vh;
 }
 
-#message.loading div {
+#progressCircle {
   display: flex;
   width: 200px;
   height: 200px;
@@ -51,7 +51,7 @@ body {
   font-size: 0;
 }
 
-#message.loading div::after {
+#progressCircle::after {
   content: attr(data-progress) '%';
   display: flex;
   justify-content: center;
