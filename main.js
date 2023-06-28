@@ -15,8 +15,8 @@ import MazeMesh from './MazeMesh.js';
 const mazeWidth = 23
 
 const parameters = {
-    elevation: 1 + 89 * Math.random(),
-    azimuth: -160,
+    elevation: 48,
+    azimuth: 53,
 };
 
 const waves = {
@@ -71,6 +71,17 @@ container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
+scene.background = new THREE.CubeTextureLoader()
+    .setPath( 'textures/calm-sea-skybox/' )
+    .load( [
+        'ft.jpg',
+        'bk.jpg',
+        'up.jpg',
+        'dn.jpg',
+        'rt.jpg',
+        'lf.jpg',
+    ] );
+
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 
@@ -79,11 +90,12 @@ const collisionner = new THREE.Group();
 // Maze
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-    map: loader.load('img/stonewall-albedo.png'),
-    normalMap: loader.load('img/stonewall-normal.png'),
-    metalnessMap: loader.load('img/stonewall-metalness.png'),
-    aoMap: loader.load('img/stonewall-ao.png'),
-    roughnessMap: loader.load('img/stonewall-roughness.png'),
+    map         : loader.load('textures/stonewall/albedo.png'),
+    normalMap   : loader.load('textures/stonewall/normal.png'),
+    metalnessMap: loader.load('textures/stonewall/metalness.png'),
+    aoMap       : loader.load('textures/stonewall/ao.png'),
+    roughnessMap: loader.load('textures/stonewall/roughness.png'),
+    envMap      : scene.background
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -110,40 +122,41 @@ for (let i = 0; i < maze.count; i++) {
 const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 1)
 const groundMaterial = new THREE.MeshStandardMaterial({
     map: loader.load(
-        'img/angled-blocks-vegetation_albedo.png',
+        'textures/angled-blocks-vegetation/albedo.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     aoMap: loader.load(
-        'img/angled-blocks-vegetation_ao.png',
+        'textures/angled-blocks-vegetation/ao.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     metalnessMap: loader.load(
-        'img/angled-blocks-vegetation_metallic.png',
+        'textures/angled-blocks-vegetation/metallic.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     normalMap: loader.load(
-        'img/angled-blocks-vegetation_normal-dx.png',
+        'textures/angled-blocks-vegetation/normal-dx.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     roughnessMap: loader.load(
-        'img/angled-blocks-vegetation_roughness.png',
+        'textures/angled-blocks-vegetation/roughness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
+    envMap: scene.background
 })
 const sideGroundMaterial = new THREE.MeshStandardMaterial()
 sideGroundMaterial.map = wallMaterial.map.clone()
@@ -189,7 +202,7 @@ const ocean = new Water(waterGeometry, {
     textureWidth: 512,
     textureHeight: 512,
     waterNormals: loader.load(
-        'img/waternormals.jpg',
+        'textures/waternormals.jpg',
         function (texture) {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }
@@ -244,25 +257,12 @@ scene.add(ocean);
 
 const sun = new THREE.Vector3();
 
-const sky = new Sky();
-sky.scale.setScalar(10000);
-scene.add(sky);
-
-const skyUniforms = sky.material.uniforms;
-
-skyUniforms['turbidity'].value = 10;
-skyUniforms['rayleigh'].value = 2;
-skyUniforms['mieCoefficient'].value = 0.005;
-skyUniforms['mieDirectionalG'].value = 0.8;
-
-//const pmremGenerator = new THREE.PMREMGenerator(renderer);
-
 // Lights
 
 const ambientLight = new THREE.AmbientLight(0x404040, 9);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xfffae8, 1);
+const sunLight = new THREE.DirectionalLight(0xfffae8, 0.7);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 0.1;
 sunLight.shadow.camera.far     =  1.4 * mazeWidth;
@@ -285,22 +285,18 @@ function updateSun() {
     const theta = THREE.MathUtils.degToRad(parameters.azimuth);
 
     sun.setFromSphericalCoords(1.4 * mazeWidth/2, phi, theta);
-
-    sky.material.uniforms['sunPosition'].value.copy(sun);
     ocean.material.uniforms['sunDirection'].value.copy(sun).normalize();
     
     sunLight.position.copy(sun)
 
     ambientLight.intensity = 5 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0));
 
-    //scene.environment = pmremGenerator.fromScene(sky).texture;
-
 }
 
 // Raft
 
 const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 8)
-const woodTexture = loader.load('img/wood.jpg');
+const woodTexture = loader.load('textures/wood.jpg');
 const raftFaceMaterial = new THREE.MeshStandardMaterial({
     map: woodTexture,
     aoMap: woodTexture,
