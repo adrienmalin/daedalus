@@ -73,7 +73,7 @@ container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
-scene.background = new THREE.CubeTextureLoader()
+scene.background = new THREE.CubeTextureLoader(loadMngr)
     .setPath( 'textures/calm-sea-skybox/' )
     .load( [
         'ft.jpg',
@@ -103,7 +103,7 @@ const wallMaterial = new THREE.MeshStandardMaterial({
     aoMap       : loader.load('textures/stonewall/ao.png'),
     roughnessMap: loader.load('textures/stonewall/roughness.png'),
 	roughness   : 1,
-	envMapIntensity: 0.1
+	envMapIntensity: 0.4
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -631,18 +631,25 @@ function getSideVector() {
 
 }
 
+var pressedMouseButtons = [];
+document.body.onmousedown = document.body.onmouseup = function(event) { 
+    for(var i=0; i <= Math.log2(event.buttons) || i < pressedMouseButtons.length; i++) {
+        pressedMouseButtons[i] = (event.buttons & (1 << i)) > 0
+    }
+}
+
 function controls(deltaTime) {
 
     // gives a bit of air control
     const speedDelta = deltaTime * (playerOnFloor ? 100 : 20) / STEPS_PER_FRAME;
 
-    if (keyStates["ArrowUp"] || keyStates['KeyW']) {
+    if (keyStates["ArrowUp"] || keyStates['KeyW'] || pressedMouseButtons[0]) {
 
         playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
 
     }
 
-    if (keyStates["ArrowDown"] || keyStates['KeyS']) {
+    if (keyStates["ArrowDown"] || keyStates['KeyS'] || pressedMouseButtons[1]) {
 
         playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta));
 
