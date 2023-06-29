@@ -122,7 +122,7 @@ for (let i = 0; i < maze.count; i++) {
     const clone = invisibleWall.clone()
     clone.position.setFromMatrixPosition(matrix);
     clone.position.y = 1;
-    //collisionner.add(clone);
+    collisionner.add(clone);
 }
 
 // Ground
