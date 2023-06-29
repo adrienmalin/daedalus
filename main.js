@@ -91,7 +91,7 @@ window.scene = scene;
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 
-const collisionner = new THREE.Group();
+const mazeCollisionner = new THREE.Group();
 
 // Maze
 
@@ -122,7 +122,7 @@ for (let i = 0; i < maze.count; i++) {
     const clone = invisibleWall.clone()
     clone.position.setFromMatrixPosition(matrix);
     clone.position.y = 1;
-    collisionner.add(clone);
+    mazeCollisionner.add(clone);
 }
 
 // Ground
@@ -204,11 +204,11 @@ ground.receiveShadow = true;
 ground.matrixAutoUpdate = false
 ground.updateMatrix();
 
-collisionner.add(ground)
+mazeCollisionner.add(ground)
 
-scene.add(collisionner);
+scene.add(mazeCollisionner);
 
-const mazeOctree = new Octree().fromGraphNode(collisionner);
+const mazeOctree = new Octree().fromGraphNode(mazeCollisionner);
 
 // Water
 
