@@ -639,7 +639,7 @@ function getSideVector() {
 
 var pressedMouseButtons = [];
 document.body.onmousedown = document.body.onmouseup = function(event) { 
-    for(var i=0; i <= Math.log2(event.buttons) || i < pressedMouseButtons.length; i++) {
+    for(var i=0; i < pressedMouseButtons.length || i <= Math.log2(event.buttons); i++) {
         pressedMouseButtons[i] = (event.buttons & (1 << i)) > 0
     }
 }
