@@ -35,12 +35,11 @@ piano.loop = false
 const loadMngr = new THREE.LoadingManager();
 const loader = new THREE.TextureLoader(loadMngr);
 loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
-	progressCircle.setAttribute("data-progress", 0)
+	progressCircle.innerText = "0%"
 	progressCircle.style.setProperty("--progress", "0deg")
-	
 }
 loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
-	progressCircle.setAttribute("data-progress", Math.floor(100 * itemsLoaded / itemsTotal))
+	progressCircle.innerText = Math.floor(100 * itemsLoaded / itemsTotal) + "%"
 	progressCircle.style.setProperty("--progress", Math.floor(360 * itemsLoaded / itemsTotal)+"deg")
 }
 loadMngr.onError = function (url) {
