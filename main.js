@@ -122,7 +122,7 @@ for (let i = 0; i < maze.count; i++) {
     const clone = invisibleWall.clone()
     clone.position.setFromMatrixPosition(matrix);
     clone.position.y = 1;
-    collisionner.add(clone);
+    //collisionner.add(clone);
 }
 
 // Ground
@@ -165,12 +165,17 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         }
     ),
 })
-const sideGroundMaterial = groundMaterial.clone()
-sideGroundMaterial.map = wallMaterial.map.clone()
-sideGroundMaterial.normalMap = wallMaterial.normalMap.clone()
-sideGroundMaterial.metalnessMap = wallMaterial.metalnessMap.clone()
-sideGroundMaterial.roughnessMap = wallMaterial.roughnessMap.clone()
-sideGroundMaterial.aoMap = wallMaterial.aoMap.clone()
+
+const sideGroundMaterial = new THREE.MeshStandardMaterial({
+    map         : wallMaterial.map.clone(),
+    normalMap   : wallMaterial.normalMap.clone(),
+	normalScale : new THREE.Vector2(0.6, 0.6),
+    metalnessMap: wallMaterial.metalnessMap.clone(),
+    aoMap       : wallMaterial.aoMap.clone(),
+    roughnessMap: wallMaterial.roughnessMap.clone(),
+	roughness   : 1,
+	envMapIntensity: 0.4
+})
 sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.metalnessMap.wrapT = THREE.RepeatWrapping
@@ -200,6 +205,10 @@ ground.matrixAutoUpdate = false
 ground.updateMatrix();
 
 collisionner.add(ground)
+
+scene.add(collisionner);
+
+const mazeOctree = new Octree().fromGraphNode(collisionner);
 
 // Water
 
@@ -344,14 +353,8 @@ raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
 raft.rotation.y = 1.4
 raft.castShadow = true;
 
-collisionner.add(raft);
-const raftOctree  = new Octree();
-raftOctree.fromGraphNode(raft)
-
-scene.add(collisionner);
-
-const worldOctree = new Octree();
-worldOctree.fromGraphNode(collisionner);
+scene.add(raft);
+const raftOctree  = new Octree().fromGraphNode(raft);
 
 //
 
@@ -368,7 +371,7 @@ if (showParam) {
     lightHelper.position.copy(maze.start)
     lightHelper.visible = false;
 
-    const octreeHelper = new OctreeHelper(worldOctree);
+    const octreeHelper = new OctreeHelper(mazeOctree);
     octreeHelper.visible = false;
     scene.add(octreeHelper);
     const showHelper = gui.add({ helpers: false }, "helpers")
@@ -546,19 +549,14 @@ document.addEventListener('keyup', (event) => {
 
 function playerCollisions() {
 
-    if (raftOctree.capsuleIntersect(playerCollider)) {
+    const playerOnMaze = mazeOctree.capsuleIntersect(playerCollider);
+    const playerOnRaft = raftOctree.capsuleIntersect(playerCollider);
 
-        camera.position.y = raft.position.y + 0.9;
-
-        if (!escaped) gameEnd()
-
-    }
-
-    const result = worldOctree.capsuleIntersect(playerCollider);
+    const result = playerOnMaze || playerOnRaft;
 
     playerOnFloor = false;
 
-    if (result) {
+    if ( result ) {
 
         playerOnFloor = result.normal.y > 0;
 
@@ -569,6 +567,14 @@ function playerCollisions() {
         }
 
         playerCollider.translate(result.normal.multiplyScalar(result.depth));
+
+    }
+
+    if (playerOnRaft) {
+
+        camera.position.y = raft.position.y + 0.9;
+
+        if (!escaped) gameEnd()
 
     }
 
@@ -604,9 +610,9 @@ function updatePlayer(deltaTime) {
     const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
     playerCollider.translate(deltaPosition);
 
-    playerCollisions();
-
     camera.position.copy(playerCollider.end);
+
+    playerCollisions();
 
 }
 
@@ -763,6 +769,7 @@ function animate() {
     const deltaTime = delta / STEPS_PER_FRAME;
 
     ocean.material.uniforms['time'].value += delta;
+
     updateRaft(delta);
 
     // we look for collisions in substeps to mitigate the risk of
