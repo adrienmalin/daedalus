@@ -24,8 +24,7 @@ const waves = {
     C: { direction: 60, steepness: 0.05, wavelength: 1.5 },
 };
 
-const showParam = window.location.search.includes("param")
-const showStats = window.location.search.includes("stats")
+const debug = window.location.search.includes("debug")
 
 const ambiance = new Audio("snd/ambiance.mp3")
 ambiance.loop = true
@@ -114,15 +113,20 @@ scene.add(maze)
 
 console.log(String(maze))
 
-const invisibleWall = new THREE.Mesh(new THREE.BoxGeometry( .9, 1.8, .9 ));
-invisibleWall.material.visible = false;
-let matrix = new THREE.Matrix4()
-for (let i = 0; i < maze.count; i++) {
-    maze.getMatrixAt(i, matrix)
-    const clone = invisibleWall.clone()
-    clone.position.setFromMatrixPosition(matrix);
-    clone.position.y = 1;
-    mazeCollisionner.add(clone);
+if (!debug) {
+
+    const invisibleWall = new THREE.Mesh(new THREE.BoxGeometry( .9, 1.8, .9 ));
+    invisibleWall.material.visible = false;
+    let matrix = new THREE.Matrix4()
+
+    for (let i = 0; i < maze.count; i++) {
+        maze.getMatrixAt(i, matrix)
+        const clone = invisibleWall.clone()
+        clone.position.setFromMatrixPosition(matrix);
+        clone.position.y = 1;
+        mazeCollisionner.add(clone);
+    }
+
 }
 
 // Ground
@@ -349,21 +353,19 @@ const raft = new THREE.Mesh(raftGeometry, [
     raftFaceMaterial,
     raftFaceMaterial,
 ])
-raft.position.set( .2, ocean.position.y, -mazeWidth/2 - 1 );
-raft.rotation.y = 1.4
+raft.position.set( .25, ocean.position.y, -mazeWidth/2 - 1.1 );
 raft.castShadow = true;
 
 scene.add(raft);
 const raftOctree  = new Octree().fromGraphNode(raft);
 
-//
-
-const stats = new Stats();
-if (showStats) container.appendChild(stats.dom);
-
 // GUI
 
-if (showParam) {
+const stats = new Stats();
+
+if (debug) {
+    
+    container.appendChild(stats.dom);
 
     const gui = new GUI();
 
@@ -790,6 +792,6 @@ function animate() {
 
     renderer.render(scene, camera);
 
-    if (showStats) stats.update();
+    if (debug) stats.update();
 
 }
