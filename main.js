@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
 import { Water } from 'three/addons/objects/Water.js';
-// import { Sky } from 'three/addons/objects/Sky.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
@@ -11,6 +10,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 import MazeMesh from './MazeMesh.js';
 
+const playerHeight = 0.5;
 const mazeWidth = 23
 
 const parameters = {
@@ -89,6 +89,7 @@ window.scene = scene;
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
+camera.position.set(0, 25 + playerHeight, 0);
 
 const mazeCollisionner = new THREE.Group();
 
@@ -500,7 +501,7 @@ const STEPS_PER_FRAME = 10;
 
 const playerCollider = new Capsule(
     new THREE.Vector3(0, 25.0, 0),
-    new THREE.Vector3(0, 25.5, 0),
+    new THREE.Vector3(0, 25 + playerHeight, 0),
     0.3
 );
 

@@ -55,11 +55,16 @@ export default class MazeMesh extends THREE.InstancedMesh {
 
     isWall(position) {
         if (0 <= position.x && position.x < this.width &&
+            0 <= position.y &&
             0 <= position.z && position.z < this.length) {
             return this.map[Math.floor(position.z)][Math.floor(position.x)]
         } else {
             return -1
         }
+    }
+
+    collision(position) {
+        return this.isWall(this.worldToLocal(position))
     }
 
     toString() {
