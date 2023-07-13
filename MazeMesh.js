@@ -12,19 +12,18 @@ export default class MazeMesh extends THREE.InstancedMesh {
         this.map = new Array(length).fill().map(() => new Array(width).fill(1))
         this.start = new THREE.Vector3(width/2, .1, length/2)
         this.exit = new THREE.Vector3(Math.floor(width/2), 0, 1)
-        this.count = length * width - 2
 
         this.dig(this.exit)
         this.dig(new THREE.Vector3(Math.floor(width/2), 0, 0))
         this.build ( this.exit )
         let matrix = new THREE.Matrix4()
-        let i=0
+        this.count = 0
         this.map.forEach((row, z) => {
             row.forEach((isWall, x) => {
                 if (isWall) {
                     matrix.setPosition( x + .5 - width/2, 0.5, z + .5 - length/2)
-                    this.setMatrixAt( i, matrix );
-                    i++
+                    this.setMatrixAt( this.count, matrix );
+                    this.count++
                 }
             })
         })
