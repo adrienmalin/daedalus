@@ -1,0 +1,23 @@
+{
+  "prompt_text": "stone retaining wall, extreme fine details",
+  "patch": {
+    "ext": "png",
+    "dtype": "uint8",
+    "width": 512,
+    "height": 512,
+    "url": "https://static-dev.withpoly.com/v3-voronoi/textures/patches/909585e0-8b3f-4659-ae84-03f58ceaaaeb.png",
+    "patch_id": "EbJzaafatu"
+  },
+  "seamless_prompt_text": "stone retaining wall, extreme fine details",
+  "seamless_patch_scale": 0.8,
+  "upscale_prompt_text": "stone retaining wall, extreme fine details",
+  "upscale_resolution": 4096,
+  "is_seamless": true,
+  "pbr_mode": "organic",
+  "pbr_generate_color": true,
+  "pbr_generate_normal": true,
+  "pbr_generate_height": true,
+  "pbr_generate_ao": true,
+  "pbr_generate_roughness": true,
+  "pbr_generate_metallic": false
+}

@@ -24,7 +24,7 @@ const waves = {
     C: { direction: 60, steepness: 0.05, wavelength: 1.5 },
 };
 
-const debug = window.location.search.includes("debug")
+const dev = window.location.search.includes("dev")
 
 const ambiance = new Audio("snd/ambiance.mp3")
 ambiance.loop = true
@@ -96,14 +96,14 @@ const mazeCollisionner = new THREE.Group();
 // Maze
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-    map         : loader.load('textures/stonewall/albedo.png'),
-    normalMap   : loader.load('textures/stonewall/normal.png'),
-	normalScale : new THREE.Vector2(0.6, 0.6),
-    metalnessMap: loader.load('textures/stonewall/metalness.png'),
-    aoMap       : loader.load('textures/stonewall/ao.png'),
-    roughnessMap: loader.load('textures/stonewall/roughness.png'),
-	roughness   : 1,
-	envMapIntensity: 0.4
+    map            : loader.load('textures/Poly-stone-retaining-wall/color_map.jpg'),
+    normalMap      : loader.load('textures/Poly-stone-retaining-wall/normal_map_opengl.jpg'),
+    //normalScale : new THREE.Vector2(0.6, 0.6),
+	//metalnessMap   : loader.load('textures/stonewall/metalness.png'),
+	aoMap          : loader.load('textures/Poly-stone-retaining-wall/ao_map.jpg'),
+	roughnessMap   : loader.load('textures/Poly-stone-retaining-wall/roughness_map.jpg'),
+	roughness      : 1,
+	//envMapIntensity: 0.4
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -114,7 +114,7 @@ scene.add(maze)
 
 console.log(String(maze))
 
-if (!debug) {
+if (!dev) {
 
     const invisibleWall = new THREE.Mesh(new THREE.BoxGeometry( .9, 1.8, .9 ));
     invisibleWall.material.visible = false;
@@ -172,23 +172,23 @@ const groundMaterial = new THREE.MeshStandardMaterial({
 })
 
 const sideGroundMaterial = new THREE.MeshStandardMaterial({
-    map         : wallMaterial.map.clone(),
-    normalMap   : wallMaterial.normalMap.clone(),
-	normalScale : new THREE.Vector2(0.6, 0.6),
-    metalnessMap: wallMaterial.metalnessMap.clone(),
-    aoMap       : wallMaterial.aoMap.clone(),
-    roughnessMap: wallMaterial.roughnessMap.clone(),
-	roughness   : 1,
-	envMapIntensity: 0.4
+    map              : wallMaterial.map.clone(),
+    normalMap        : wallMaterial.normalMap.clone(),
+    normalScale      : new THREE.Vector2(0.6, 0.6),
+    //metalnessMap: wallMaterial.metalnessMap.clone(),
+	aoMap            : wallMaterial.aoMap.clone(),
+	roughnessMap     : wallMaterial.roughnessMap.clone(),
+	roughness        : 1,
+	envMapIntensity  : 0.4
 })
 sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.metalnessMap.wrapT = THREE.RepeatWrapping
+//sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.metalnessMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.map.repeat.set(mazeWidth, 1)
 sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
+//sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 1)
 
@@ -314,33 +314,39 @@ function updateSun() {
 
 // Raft
 
-const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 8)
-const woodTexture = loader.load('textures/wood.jpg');
+const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 16)
+//const woodTexture = loader.load('textures/wood.jpg');
 const raftFaceMaterial = new THREE.MeshStandardMaterial({
-    map: woodTexture,
-    aoMap: woodTexture,
-    roughnessMap: woodTexture,
-    color: 0xFFFFFF,
-    emissive: 0,
-    bumpMap: woodTexture,
+    map: loader.load("textures/Poly-raft-wood/color_map.jpg"),
+    aoMap: loader.load("textures/Poly-raft-wood/ao_map.jpg"),
+    normalMap: loader.load("textures/Poly-raft-wood/normal_map_opengl.jpg"),
+    normalScale : new THREE.Vector2(2, 2),
+    roughnessMap: loader.load("textures/Poly-raft-wood/roughness_map.jpg"),
+    //color: 0xFFFFFF,
+    //emissive: 0,
+    //bumpMap: loader.load("Poly-raft-wood/displacement_map.jpg"),
     bumpScale: .1,
     depthFunc: 3,
     depthTest: true,
     depthWrite: true,
-    displacementMap: woodTexture,
-    displacementScale: -0.08
+    displacementMap: loader.load("textures/Poly-raft-wood/displacement_map.jpg"),
+    displacementScale: 0.2,
+    displacementBias: -0.1,
+	envMapIntensity: 0.03
 })
 const raftSideMaterial = new THREE.MeshStandardMaterial({
-    map: woodTexture,
-    aoMap: woodTexture,
-    roughnessMap: woodTexture,
-    color: 0xFFFFFF,
-    emissive: 0,
-    bumpMap: woodTexture,
-    bumpScale: .1,
+    map: raftFaceMaterial.map,
+    aoMap: raftFaceMaterial.aoMap,
+    normalMap: raftFaceMaterial.normalMap,
+    roughnessMap: raftFaceMaterial.roughnessMap,
+    //color: 0xFFFFFF,
+    //emissive: 0,
+    //bumpMap: raftFaceMaterial.bumpMap,
+    bumpScale: .01,
     depthFunc: 3,
     depthTest: true,
     depthWrite: true,
+	envMapIntensity: 0.03
 })
 const raft = new THREE.Mesh(raftGeometry, [
     raftSideMaterial,
@@ -360,7 +366,7 @@ const raftOctree  = new Octree().fromGraphNode(raft);
 
 const stats = new Stats();
 
-if (debug) {
+if (dev) {
     
     container.appendChild(stats.dom);
 
@@ -789,6 +795,6 @@ function animate() {
 
     renderer.render(scene, camera);
 
-    if (debug) stats.update();
+    if (dev) stats.update();
 
 }
