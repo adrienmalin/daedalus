@@ -1,0 +1,23 @@
+{
+  "prompt_text": "cobblestone wall with grass and flowers between rocks",
+  "patch": {
+    "ext": "png",
+    "dtype": "uint8",
+    "width": 512,
+    "height": 512,
+    "url": "https://static-dev.withpoly.com/v3-voronoi/textures/patches/486f8eed-0dfd-4bdc-9dee-3776fc72b1f1.png",
+    "patch_id": "GVpEsGuQ8S"
+  },
+  "seamless_prompt_text": "cobblestone wall with grass and flowers between rocks",
+  "seamless_patch_scale": 0.98,
+  "upscale_prompt_text": "cobblestone wall with grass and flowers between rocks",
+  "upscale_resolution": 4096,
+  "is_seamless": true,
+  "pbr_mode": "organic",
+  "pbr_use_render_as_color": true,
+  "pbr_generate_normal": true,
+  "pbr_generate_height": true,
+  "pbr_generate_ao": true,
+  "pbr_generate_roughness": true,
+  "pbr_generate_metallic": false
+}

@@ -1,0 +1,23 @@
+{
+  "prompt_text": "wood, planks, wooden, green paint, painted wood, paint, scrathes, raw wood, peeling paint",
+  "patch": {
+    "ext": "png",
+    "dtype": "uint8",
+    "width": 512,
+    "height": 512,
+    "url": "https://static-dev.withpoly.com/v3-voronoi/textures/patches/0ddfc901-a5dd-40f0-993b-8de3ccefb7f7.png",
+    "patch_id": "a79eceALs5"
+  },
+  "seamless_prompt_text": "wood, planks, wooden, green paint, painted wood, paint, scrathes, raw wood, peeling paint",
+  "seamless_patch_scale": 0.8,
+  "upscale_prompt_text": "wood, planks, wooden, green paint, painted wood, paint, scrathes, raw wood, peeling paint",
+  "upscale_resolution": 4096,
+  "is_seamless": true,
+  "pbr_mode": "matte",
+  "pbr_generate_color": true,
+  "pbr_generate_normal": true,
+  "pbr_generate_height": true,
+  "pbr_generate_ao": true,
+  "pbr_generate_roughness": true,
+  "pbr_generate_metallic": false
+}

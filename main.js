@@ -42,7 +42,7 @@ loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
 	progressCircle.style.setProperty("--progress", Math.floor(360 * itemsLoaded / itemsTotal)+"deg")
 }
 loadMngr.onError = function (url) {
-    message.innerHTML = 'Erreur de chargement'
+    message.innerHTML = `Erreur de chargement :<br/>${url}`
 }
 loadMngr.onLoad = () => {
     message.innerHTML = ""
@@ -65,8 +65,8 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 //renderer.toneMappingExposure = 0.5;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.physicallyCorrectLights = true;
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.useLegacyLights = false;
+//renderer.outputColorSpace  = THREE.sRGBEncoding;
 
 container.appendChild(renderer.domElement);
 
@@ -96,12 +96,10 @@ const mazeCollisionner = new THREE.Group();
 // Maze
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-    map            : loader.load('textures/Poly-stone-retaining-wall/color_map.jpg'),
-    normalMap      : loader.load('textures/Poly-stone-retaining-wall/normal_map_opengl.jpg'),
-    //normalScale : new THREE.Vector2(0.6, 0.6),
-	//metalnessMap   : loader.load('textures/stonewall/metalness.png'),
-	aoMap          : loader.load('textures/Poly-stone-retaining-wall/ao_map.jpg'),
-	roughnessMap   : loader.load('textures/Poly-stone-retaining-wall/roughness_map.jpg'),
+    map            : loader.load('textures/Poly-cobblestone-wall/color_map.jpg'),
+    normalMap      : loader.load('textures/Poly-cobblestone-wall/normal_map_opengl.jpg'),
+	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.jpg'),
+	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.jpg'),
 	roughness      : 1,
 	envMapIntensity: 0.5
 })
@@ -169,28 +167,30 @@ const groundMaterial = new THREE.MeshStandardMaterial({
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
+	envMapIntensity  : 0.5
 })
 
 const sideGroundMaterial = new THREE.MeshStandardMaterial({
     map              : wallMaterial.map.clone(),
     normalMap        : wallMaterial.normalMap.clone(),
     normalScale      : new THREE.Vector2(0.6, 0.6),
-    //metalnessMap: wallMaterial.metalnessMap.clone(),
 	aoMap            : wallMaterial.aoMap.clone(),
 	roughnessMap     : wallMaterial.roughnessMap.clone(),
 	roughness        : 1,
-	envMapIntensity  : 0.4
+	envMapIntensity  : 0.5
 })
 sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-//sideGroundMaterial.metalnessMap.wrapS = sideGroundMaterial.metalnessMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.map.repeat.set(mazeWidth, 1)
 sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
-//sideGroundMaterial.metalnessMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
 sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.map.rotation = Math.PI
+sideGroundMaterial.normalMap.rotation = Math.PI
+sideGroundMaterial.aoMap.rotation = Math.PI
+sideGroundMaterial.roughnessMap.rotation = Math.PI
 
 const ground = new THREE.Mesh(
     groundGeometry,
@@ -315,47 +315,36 @@ function updateSun() {
 // Raft
 
 const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 16)
-//const woodTexture = loader.load('textures/wood.jpg');
-const raftFaceMaterial = new THREE.MeshStandardMaterial({
-    map: loader.load("textures/Poly-raft-wood/color_map.jpg"),
-    aoMap: loader.load("textures/Poly-raft-wood/ao_map.jpg"),
-    normalMap: loader.load("textures/Poly-raft-wood/normal_map_opengl.jpg"),
+const raftMaterial = new THREE.MeshStandardMaterial({
+    map: loader.load("textures/Poly-wood/color_map.jpg", texture => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+        texture.repeat.set(2, 1)
+    }),
+    aoMap: loader.load("textures/Poly-wood/ao_map.jpg", texture => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+        texture.repeat.set(2, 1)
+    }),
+    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.jpg", texture => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+        texture.repeat.set(2, 1)
+    }),
     normalScale : new THREE.Vector2(2, 2),
-    roughnessMap: loader.load("textures/Poly-raft-wood/roughness_map.jpg"),
-    //color: 0xFFFFFF,
-    //emissive: 0,
-    //bumpMap: loader.load("Poly-raft-wood/displacement_map.jpg"),
-    bumpScale: .1,
+    roughnessMap: loader.load("textures/Poly-wood/roughness_map.jpg", texture => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+        texture.repeat.set(2, 1)
+    }),
     depthFunc: 3,
     depthTest: true,
     depthWrite: true,
-    displacementMap: loader.load("textures/Poly-raft-wood/displacement_map.jpg"),
-    displacementScale: 0.2,
-    displacementBias: -0.1,
-	envMapIntensity: 0.03
+    displacementMap: loader.load("textures/Poly-wood/displacement_map.jpg", texture => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+        texture.repeat.set(2, 1)
+    }),
+    displacementScale: -0.2,
+    displacementBias: 0.1,
+	envMapIntensity: 0.5
 })
-const raftSideMaterial = new THREE.MeshStandardMaterial({
-    map: raftFaceMaterial.map,
-    aoMap: raftFaceMaterial.aoMap,
-    normalMap: raftFaceMaterial.normalMap,
-    roughnessMap: raftFaceMaterial.roughnessMap,
-    //color: 0xFFFFFF,
-    //emissive: 0,
-    //bumpMap: raftFaceMaterial.bumpMap,
-    bumpScale: .01,
-    depthFunc: 3,
-    depthTest: true,
-    depthWrite: true,
-	envMapIntensity: 0.03
-})
-const raft = new THREE.Mesh(raftGeometry, [
-    raftSideMaterial,
-    raftSideMaterial,
-    raftFaceMaterial,
-    raftSideMaterial,
-    raftFaceMaterial,
-    raftFaceMaterial,
-])
+const raft = new THREE.Mesh(raftGeometry, raftMaterial)
 raft.position.set( .25, ocean.position.y, -mazeWidth/2 - 1.1 );
 raft.castShadow = true;
 
