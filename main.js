@@ -103,7 +103,7 @@ const wallMaterial = new THREE.MeshStandardMaterial({
 	aoMap          : loader.load('textures/Poly-stone-retaining-wall/ao_map.jpg'),
 	roughnessMap   : loader.load('textures/Poly-stone-retaining-wall/roughness_map.jpg'),
 	roughness      : 1,
-	//envMapIntensity: 0.4
+	envMapIntensity: 0.5
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
