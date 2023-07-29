@@ -44,7 +44,7 @@ loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
 loadMngr.onError = function (url) {
     message.innerHTML = `Erreur de chargement :<br/>${url}`
 }
-loadMngr.onLoad = () => {
+loadMngr.onLoad = function (url, itemsLoaded, itemsTotal) {
     message.innerHTML = ""
     message.className = ""
 
@@ -136,38 +136,38 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         'textures/angled-blocks-vegetation/albedo.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     aoMap: loader.load(
         'textures/angled-blocks-vegetation/ao.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     metalnessMap: loader.load(
         'textures/angled-blocks-vegetation/metallic.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     normalMap: loader.load(
         'textures/angled-blocks-vegetation/normal-dx.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     roughnessMap: loader.load(
         'textures/angled-blocks-vegetation/roughness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
-	envMapIntensity  : 0.5
+	envMapIntensity  : 0.6
 })
 
 const sideGroundMaterial = new THREE.MeshStandardMaterial({
@@ -273,6 +273,7 @@ ocean.material.onBeforeCompile = function (shader) {
 };
 
 scene.add(ocean);
+const oceanOctree  = new Octree().fromGraphNode(ocean);
 
 // Lights
 
@@ -340,12 +341,12 @@ const raftMaterial = new THREE.MeshStandardMaterial({
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping
         texture.repeat.set(2, 1)
     }),
-    displacementScale: -0.2,
-    displacementBias: 0.1,
+    displacementScale: -0.3,
+    displacementBias: 0.15,
 	envMapIntensity: 0.5
 })
 const raft = new THREE.Mesh(raftGeometry, raftMaterial)
-raft.position.set( .25, ocean.position.y, -mazeWidth/2 - 1.1 );
+raft.position.set( .25, ocean.position.y, -mazeWidth/2 - 1.1 )
 raft.castShadow = true;
 
 scene.add(raft);
@@ -376,22 +377,32 @@ if (dev) {
 
     });
 
-    const folderSky = gui.addFolder('Sky');
-    folderSky.add(parameters, 'elevation', 0, 90, 0.1).onChange(updateSun);
-    folderSky.add(parameters, 'azimuth', - 180, 180, 0.1).onChange(updateSun);
-    folderSky.open();
+    const raftFolder = gui.addFolder("Raft")
+    const raftPositionFolder = raftFolder.addFolder("position")
+    raftPositionFolder.add(raft.position, "x")
+    raftPositionFolder.add(raft.position, "y")
+    raftPositionFolder.add(raft.position, "z")
+    const raftRotationFolder = raftFolder.addFolder("rotation")
+    raftRotationFolder.add(raft.rotation, "x")
+    raftRotationFolder.add(raft.rotation, "y")
+    raftRotationFolder.add(raft.rotation, "z")
+
+    const skyFolder = gui.addFolder('Sky');
+    skyFolder.add(parameters, 'elevation', 0, 90, 0.1).onChange(updateSun);
+    skyFolder.add(parameters, 'azimuth', - 180, 180, 0.1).onChange(updateSun);
+    skyFolder.close();
 
     const waterUniforms = ocean.material.uniforms;
 
-    const folderWater = gui.addFolder('Water');
-    folderWater
+    const waterFolder = gui.addFolder('Water');
+    waterFolder
         .add(waterUniforms.distortionScale, 'value', 0, 8, 0.1)
         .name('distortionScale');
-    folderWater.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size');
-    folderWater.add(ocean.material, 'wireframe');
-    folderWater.open();
+    waterFolder.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size');
+    waterFolder.add(ocean.material, 'wireframe');
+    waterFolder.close();
 
-    const waveAFolder = gui.addFolder('Wave A');
+    const waveAFolder = waterFolder.addFolder('Wave A');
     waveAFolder
         .add(waves.A, 'direction', 0, 359)
         .name('Direction')
@@ -420,7 +431,7 @@ if (dev) {
         });
     waveAFolder.open();
 
-    const waveBFolder = gui.addFolder('Wave B');
+    const waveBFolder = waterFolder.addFolder('Wave B');
     waveBFolder
         .add(waves.B, 'direction', 0, 359)
         .name('Direction')
@@ -449,7 +460,7 @@ if (dev) {
         });
     waveBFolder.open();
 
-    const waveCFolder = gui.addFolder('Wave C');
+    const waveCFolder = waterFolder.addFolder('Wave C');
     waveCFolder
         .add(waves.C, 'direction', 0, 359)
         .name('Direction')
@@ -506,26 +517,6 @@ let escaped = false;
 const pointerLockControls = new PointerLockControls(camera, document.body);
 pointerLockControls.pointerSpeed = 0.7;
 
-container.addEventListener('click', function () {
-
-    pointerLockControls.lock();
-
-});
-
-pointerLockControls.addEventListener('lock', function () {
-
-    ambiance.play();
-
-});
-
-pointerLockControls.addEventListener('unlock', function () {
-
-    ambiance.pause();
-
-});
-
-scene.add(pointerLockControls.getObject());
-
 const keyStates = {};
 
 document.addEventListener('keydown', (event) => {
@@ -541,12 +532,51 @@ document.addEventListener('keyup', (event) => {
 
 });
 
+var pressedMouseButtons = [];
+
+function onMouseChange(event) {
+
+    for(var i=0; i < pressedMouseButtons.length || i <= Math.log2(event.buttons); i++) {
+        pressedMouseButtons[i] = (event.buttons & (1 << i)) > 0
+    }
+
+}
+
+container.addEventListener('click', function () {
+
+    pointerLockControls.lock();
+
+});
+
+pointerLockControls.addEventListener('lock', function () {
+
+    ambiance.play();
+
+    container.addEventListener('mousedown', onMouseChange)
+
+    container.addEventListener('mouseup', onMouseChange)
+
+});
+
+pointerLockControls.addEventListener('unlock', function () {
+
+    ambiance.pause();
+
+    container.removeEventListener('mousedown', onMouseChange)
+
+    container.removeEventListener('mouseup', onMouseChange)
+
+});
+
+scene.add(pointerLockControls.getObject());
+
 function playerCollisions() {
 
-    const playerOnMaze = mazeOctree.capsuleIntersect(playerCollider);
-    const playerOnRaft = raftOctree.capsuleIntersect(playerCollider);
+    const playerOnMaze  = mazeOctree.capsuleIntersect(playerCollider)
+    const playerOnRaft  = raftOctree.capsuleIntersect(playerCollider)
+    const playerOnWater = oceanOctree.capsuleIntersect(playerCollider)
 
-    const result = playerOnMaze || playerOnRaft;
+    const result = playerOnMaze || playerOnRaft || playerOnWater
 
     playerOnFloor = false;
 
@@ -562,13 +592,19 @@ function playerCollisions() {
 
         playerCollider.translate(result.normal.multiplyScalar(result.depth));
 
-    }
-
-    if (playerOnRaft) {
-
-        camera.position.y = raft.position.y + 0.9;
-
-        if (!escaped) gameEnd()
+        if (playerOnRaft) {
+    
+            camera.position.y = playerCollider.end.y + raft.position.y
+    
+            if (!escaped) gameEnd()
+    
+        } else if (playerOnWater) {
+    
+            const t = ocean.material.uniforms['time'].value;
+            const waveInfo = getWaveInfo(playerCollider.end.x, playerCollider.end.z, t)
+            camera.position.y = ocean.position.y + waveInfo.position.y + 0.2
+            
+        }
 
     }
 
@@ -577,7 +613,7 @@ function playerCollisions() {
 function gameEnd() {
 
     escaped = true;
-    message.innerHTML = '<a href="" title="Rejouer">Libre !</a>';
+    message.innerHTML = '<h2>Libre !</h2><a href="">Rejouer</a>';
     message.className = "escaped";
     piano.play();
 
@@ -594,8 +630,7 @@ function updatePlayer(deltaTime) {
 
         playerVelocity.y -= GRAVITY * deltaTime;
 
-        // small air resistance
-        damping *= 0.1;
+        damping *= 0.1; // small air resistance
 
     }
 
@@ -629,13 +664,6 @@ function getSideVector() {
 
     return playerDirection;
 
-}
-
-var pressedMouseButtons = [];
-document.body.onmousedown = document.body.onmouseup = function(event) { 
-    for(var i=0; i < pressedMouseButtons.length || i <= Math.log2(event.buttons); i++) {
-        pressedMouseButtons[i] = (event.buttons & (1 << i)) > 0
-    }
 }
 
 function controls(deltaTime) {

@@ -76,14 +76,14 @@ body {
 }
 
 #message a {
-  text-decoration: none;
   color: inherit;
 }
 
 #message.escaped {
-  display: flex;
+  display: block; 
   opacity: 100%;
-  font-size: 10vh;
+  font-size: 4vh;
+  text-align: center;
   top: 30vh;
   animation: escaped 5s;
 }
