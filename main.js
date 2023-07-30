@@ -101,7 +101,6 @@ const wallMaterial = new THREE.MeshStandardMaterial({
 	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.jpg'),
 	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.jpg'),
 	roughness      : 1,
-	envMapIntensity: 0.5
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -136,38 +135,37 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         'textures/angled-blocks-vegetation/albedo.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     aoMap: loader.load(
         'textures/angled-blocks-vegetation/ao.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     metalnessMap: loader.load(
         'textures/angled-blocks-vegetation/metallic.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     normalMap: loader.load(
         'textures/angled-blocks-vegetation/normal-dx.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
     roughnessMap: loader.load(
         'textures/angled-blocks-vegetation/roughness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
+            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
-	envMapIntensity  : 0.6
 })
 
 const sideGroundMaterial = new THREE.MeshStandardMaterial({
@@ -177,7 +175,6 @@ const sideGroundMaterial = new THREE.MeshStandardMaterial({
 	aoMap            : wallMaterial.aoMap.clone(),
 	roughnessMap     : wallMaterial.roughnessMap.clone(),
 	roughness        : 1,
-	envMapIntensity  : 0.5
 })
 sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
@@ -282,7 +279,7 @@ const sun = new THREE.Vector3();
 //const ambientLight = new THREE.AmbientLight(0x404040, 7);
 //scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xfffae8, 2);
+const sunLight = new THREE.DirectionalLight(0xffffff, 1);
 sunLight.castShadow            = true;
 sunLight.shadow.camera.near    = 0.1;
 sunLight.shadow.camera.far     =  1.4 * mazeWidth;
@@ -343,7 +340,6 @@ const raftMaterial = new THREE.MeshStandardMaterial({
     }),
     displacementScale: -0.3,
     displacementBias: 0.15,
-	envMapIntensity: 0.5
 })
 const raft = new THREE.Mesh(raftGeometry, raftMaterial)
 raft.position.set( .25, ocean.position.y, -mazeWidth/2 - 1.1 )
@@ -618,7 +614,7 @@ function gameEnd() {
     piano.play();
 
     document.exitPointerLock();
-    container.style.cursor = "default";
+    //container.style.cursor = "default";
 
 }
 
@@ -708,22 +704,6 @@ function controls(deltaTime) {
 
 }
 
-function teleportPlayerIfOob() {
-
-    if (camera.position.y <= - 25) {
-
-        playerCollider.start.set(0, 25, 0);
-        playerCollider.end.set(0, 25.5, 0);
-        playerCollider.radius = 0.3;
-        camera.position.copy(playerCollider.end);
-        camera.rotation.set(0, 0, 0);
-        message.className = ""
-        escaped = false;
-
-    }
-
-}
-
 function getWaveInfo(x, z, time) {
 
     const pos = new THREE.Vector3();
@@ -802,8 +782,6 @@ function animate() {
         controls(deltaTime);
 
         updatePlayer(deltaTime);
-
-        teleportPlayerIfOob();
 
     }
 

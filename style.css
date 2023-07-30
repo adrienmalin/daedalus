@@ -44,6 +44,7 @@ body {
   gap: 5rem;
   text-align: center;
   font-size: 1.7em;
+  cursor: progress;
 }
 
 #progressCircle {
