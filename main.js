@@ -62,11 +62,8 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-//renderer.toneMappingExposure = 0.5;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.useLegacyLights = false;
-//renderer.outputColorSpace  = THREE.sRGBEncoding;
 
 container.appendChild(renderer.domElement);
 
