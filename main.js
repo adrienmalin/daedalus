@@ -126,7 +126,7 @@ if (!dev) {
 
 // Ground
 
-const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 1)
+const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 20)
 const groundMaterial = new THREE.MeshStandardMaterial({
     map: loader.load(
         'textures/angled-blocks-vegetation/albedo.png',
@@ -177,10 +177,10 @@ sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrappi
 sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.map.repeat.set(mazeWidth, 1)
-sideGroundMaterial.normalMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.aoMap.repeat.set(mazeWidth, 1)
-sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 1)
+sideGroundMaterial.map.repeat.set(mazeWidth, 20)
+sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
+sideGroundMaterial.aoMap.repeat.set(mazeWidth, 20)
+sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
 sideGroundMaterial.map.rotation = Math.PI
 sideGroundMaterial.normalMap.rotation = Math.PI
 sideGroundMaterial.aoMap.rotation = Math.PI
@@ -198,7 +198,7 @@ const ground = new THREE.Mesh(
     ]
 )
 ground.rotation.x = -Math.PI / 2;
-ground.position.y = -0.5
+ground.position.y = -10
 ground.receiveShadow = true;
 ground.matrixAutoUpdate = false
 ground.updateMatrix();
