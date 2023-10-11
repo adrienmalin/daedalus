@@ -122,6 +122,12 @@ if (!dev) {
         mazeCollisionner.add(clone);
     }
 
+    setInterval(() => {
+        let x = Math.floor(8 + camera.position.x * 16 / mazeWidth)
+        let y = Math.floor(8 + camera.position.z * 16 / mazeWidth)
+        favicon.href = `favicon.php?x=${x}&y=${y}`
+    }, 1000);
+
 }
 
 // Ground
