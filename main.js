@@ -49,6 +49,12 @@ loadMngr.onLoad = function (url, itemsLoaded, itemsTotal) {
     message.className = ""
 
     renderer.setAnimationLoop(animate)
+
+    setInterval(() => {
+        let x = Math.floor(8 + camera.position.x * 16 / mazeWidth)
+        let y = Math.floor(8 + camera.position.z * 16 / mazeWidth)
+        favicon.href = `favicon.php?x=${x}&y=${y}`
+    }, 1000);
 };
 
 //
@@ -121,12 +127,6 @@ if (!dev) {
         clone.position.y = 1;
         mazeCollisionner.add(clone);
     }
-
-    setInterval(() => {
-        let x = Math.floor(8 + camera.position.x * 16 / mazeWidth)
-        let y = Math.floor(8 + camera.position.z * 16 / mazeWidth)
-        favicon.href = `favicon.php?x=${x}&y=${y}`
-    }, 1000);
 
 }
 
@@ -279,8 +279,8 @@ const oceanOctree  = new Octree().fromGraphNode(ocean);
 
 const sun = new THREE.Vector3();
 
-//const ambientLight = new THREE.AmbientLight(0x404040, 7);
-//scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight(0x404040, 7);
+scene.add(ambientLight);
 
 const sunLight = new THREE.DirectionalLight(0xffffff, 1);
 sunLight.castShadow            = true;
@@ -551,9 +551,9 @@ pointerLockControls.addEventListener('lock', function () {
 
     ambiance.play();
 
-    container.addEventListener('mousedown', onMouseChange)
+    document.addEventListener('mousedown', onMouseChange)
 
-    container.addEventListener('mouseup', onMouseChange)
+    document.addEventListener('mouseup', onMouseChange)
 
 });
 
@@ -561,9 +561,9 @@ pointerLockControls.addEventListener('unlock', function () {
 
     ambiance.pause();
 
-    container.removeEventListener('mousedown', onMouseChange)
+    document.removeEventListener('mousedown', onMouseChange)
 
-    container.removeEventListener('mouseup', onMouseChange)
+    document.removeEventListener('mouseup', onMouseChange)
 
 });
 
