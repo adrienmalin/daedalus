@@ -549,12 +549,12 @@ document.addEventListener('keyup', (event) => {
 
 });
 
-var pressedMouseButtons = [];
+var mouseButtonsStates = [];
 
 function onMouseChange(event) {
 
-    for(var i=0; i < pressedMouseButtons.length || i <= Math.log2(event.buttons); i++) {
-        pressedMouseButtons[i] = (event.buttons & (1 << i)) > 0
+    for(var i=0; i < mouseButtonsStates.length || i <= Math.log2(event.buttons); i++) {
+        mouseButtonsStates[i] = (event.buttons & (1 << i)) > 0
     }
 
 }
@@ -688,13 +688,13 @@ function controls(deltaTime) {
     // gives a bit of air control
     const speedDelta = deltaTime * (playerOnFloor ? 100 : 20) / STEPS_PER_FRAME;
 
-    if (keyStates["ArrowUp"] || keyStates['KeyW'] || pressedMouseButtons[0]) {
+    if (keyStates["ArrowUp"] || keyStates['KeyW'] || mouseButtonsStates[0]) {
 
         playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
 
     }
 
-    if (keyStates["ArrowDown"] || keyStates['KeyS'] || pressedMouseButtons[1]) {
+    if (keyStates["ArrowDown"] || keyStates['KeyS'] || mouseButtonsStates[1]) {
 
         playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta));
 
