@@ -145,14 +145,14 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         }
     ),
     aoMap: loader.load(
-        'textures/angled-blocks-vegetation/ao.png',
+        'textures/angled-blocks-vegetation/ao-roughness-metalness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     metalnessMap: loader.load(
-        'textures/angled-blocks-vegetation/metallic.png',
+        'textures/angled-blocks-vegetation/ao-roughness-metalness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
@@ -166,7 +166,7 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         }
     ),
     roughnessMap: loader.load(
-        'textures/angled-blocks-vegetation/roughness.png',
+        'textures/angled-blocks-vegetation/ao-roughness-metalness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
             texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
