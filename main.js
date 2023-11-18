@@ -10,6 +10,8 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 import MazeMesh from './MazeMesh.js';
 
+import 'three-hex-tiling';
+
 const playerHeight = 0.5;
 const mazeWidth = 23
 
@@ -86,6 +88,7 @@ scene.background = new THREE.CubeTextureLoader(loadMngr)
         'lf.jpg',
     ] );
 scene.backgroundBlurriness = 0.03;
+scene.backgroundIntensity  = 1.4;
 scene.environment = scene.background;
 
 window.scene = scene;
@@ -104,6 +107,12 @@ const wallMaterial = new THREE.MeshStandardMaterial({
 	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.jpg'),
 	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.jpg'),
 	roughness      : 1,
+    hexTiling: {
+        patchScale: 2,
+        useContrastCorrectedBlending: true,
+        lookupSkipThreshold: 0.01,
+        textureSampleCoefficientExponent: 8,
+    }
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -169,6 +178,12 @@ const groundMaterial = new THREE.MeshStandardMaterial({
             texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
         }
     ),
+    hexTiling: {
+        patchScale: 2,
+        useContrastCorrectedBlending: true,
+        lookupSkipThreshold: 0.01,
+        textureSampleCoefficientExponent: 8,
+    }
 })
 
 const sideGroundMaterial = new THREE.MeshStandardMaterial({
