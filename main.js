@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-
 import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
 import { Water } from 'three/addons/objects/Water.js';
@@ -8,9 +7,10 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
+import 'three-hex-tiling';
+
 import MazeMesh from './MazeMesh.js';
 
-import 'three-hex-tiling';
 
 const playerHeight = 0.5;
 const mazeWidth = 23
