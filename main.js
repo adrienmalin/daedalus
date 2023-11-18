@@ -106,13 +106,7 @@ const wallMaterial = new THREE.MeshStandardMaterial({
     normalMap      : loader.load('textures/Poly-cobblestone-wall/normal_map_opengl.jpg'),
 	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.jpg'),
 	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.jpg'),
-	roughness      : 1,
-    hexTiling: {
-        patchScale: 2,
-        useContrastCorrectedBlending: true,
-        lookupSkipThreshold: 0.01,
-        textureSampleCoefficientExponent: 8,
-    }
+	roughness      : 1
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial);
@@ -147,42 +141,42 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         'textures/angled-blocks-vegetation/albedo.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     aoMap: loader.load(
         'textures/angled-blocks-vegetation/ao.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     metalnessMap: loader.load(
         'textures/angled-blocks-vegetation/metallic.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     normalMap: loader.load(
         'textures/angled-blocks-vegetation/normal-dx.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     roughnessMap: loader.load(
         'textures/angled-blocks-vegetation/roughness.png',
         texture => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
         }
     ),
     hexTiling: {
-        patchScale: 2,
+        patchScale: 1,
         useContrastCorrectedBlending: true,
         lookupSkipThreshold: 0.01,
-        textureSampleCoefficientExponent: 8,
+        textureSampleCoefficientExponent: 32,
     }
 })
 
@@ -400,6 +394,7 @@ if (dev) {
     raftRotationFolder.add(raft.rotation, "x")
     raftRotationFolder.add(raft.rotation, "y")
     raftRotationFolder.add(raft.rotation, "z")
+    raftFolder.close();
 
     const skyFolder = gui.addFolder('Sky');
     skyFolder.add(parameters, 'elevation', 0, 90, 0.1).onChange(updateSun);
@@ -502,6 +497,14 @@ if (dev) {
 
         });
     waveCFolder.open();
+
+    const HexTilingFolder = gui.addFolder('Hex Tiling')
+    const groundMaterialFolder = HexTilingFolder.addFolder("ground")
+    groundMaterialFolder.add(groundMaterial.hexTiling, "patchScale", 0, 10)
+    groundMaterialFolder.add(groundMaterial.hexTiling, "useContrastCorrectedBlending")
+    groundMaterialFolder.add(groundMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
+    groundMaterialFolder.add(groundMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
+    HexTilingFolder.close()
 
 }
 
