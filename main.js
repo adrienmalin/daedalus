@@ -416,27 +416,21 @@ if (dev) {
         .add(waves.A, 'direction', 0, 359)
         .name('Direction')
         .onChange((v) => {
-
             const x = (v * Math.PI) / 180;
             ocean.material.uniforms.waveA.value[0] = Math.sin(x);
             ocean.material.uniforms.waveA.value[1] = Math.cos(x);
-
         });
     waveAFolder
         .add(waves.A, 'steepness', 0, 1, 0.01)
         .name('Steepness')
         .onChange((v) => {
-
             ocean.material.uniforms.waveA.value[2] = v;
-
         });
     waveAFolder
         .add(waves.A, 'wavelength', 1, 100)
         .name('Wavelength')
         .onChange((v) => {
-
             ocean.material.uniforms.waveA.value[3] = v;
-
         });
     waveAFolder.open();
 
@@ -445,27 +439,21 @@ if (dev) {
         .add(waves.B, 'direction', 0, 359)
         .name('Direction')
         .onChange((v) => {
-
             const x = (v * Math.PI) / 180;
             ocean.material.uniforms.waveB.value[0] = Math.sin(x);
             ocean.material.uniforms.waveB.value[1] = Math.cos(x);
-
         });
     waveBFolder
         .add(waves.B, 'steepness', 0, 1, 0.01)
         .name('Steepness')
         .onChange((v) => {
-
             ocean.material.uniforms.waveB.value[2] = v;
-
         });
     waveBFolder
         .add(waves.B, 'wavelength', 1, 100)
         .name('Wavelength')
         .onChange((v) => {
-
             ocean.material.uniforms.waveB.value[3] = v;
-
         });
     waveBFolder.open();
 
@@ -474,27 +462,21 @@ if (dev) {
         .add(waves.C, 'direction', 0, 359)
         .name('Direction')
         .onChange((v) => {
-
             const x = (v * Math.PI) / 180;
             ocean.material.uniforms.waveC.value[0] = Math.sin(x);
             ocean.material.uniforms.waveC.value[1] = Math.cos(x);
-
         });
     waveCFolder
         .add(waves.C, 'steepness', 0, 1, 0.01)
         .name('Steepness')
         .onChange((v) => {
-
             ocean.material.uniforms.waveC.value[2] = v;
-
         });
     waveCFolder
         .add(waves.C, 'wavelength', 1, 100)
         .name('Wavelength')
         .onChange((v) => {
-
             ocean.material.uniforms.waveC.value[3] = v;
-
         });
     waveCFolder.open();
 
@@ -537,53 +519,37 @@ pointerLockControls.pointerSpeed = 0.7;
 const keyStates = {};
 
 document.addEventListener('keydown', (event) => {
-
     keyStates[event.code] = true;
-
 });
 
 document.addEventListener('keyup', (event) => {
-
     keyStates[event.code] = false;
     if (event.code == 'Space') jumping = false
-
 });
 
 var mouseButtonsStates = [];
 
 function onMouseChange(event) {
-
     for(var i=0; i < mouseButtonsStates.length || i <= Math.log2(event.buttons); i++) {
         mouseButtonsStates[i] = (event.buttons & (1 << i)) > 0
     }
-
 }
 
 container.addEventListener('click', function () {
-
     pointerLockControls.lock();
-
-});
+})
 
 pointerLockControls.addEventListener('lock', function () {
-
     ambiance.play();
-
     document.addEventListener('mousedown', onMouseChange)
-
     document.addEventListener('mouseup', onMouseChange)
-
-});
+})
 
 pointerLockControls.addEventListener('unlock', function () {
-
     ambiance.pause();
-
     document.removeEventListener('mousedown', onMouseChange)
-
     document.removeEventListener('mouseup', onMouseChange)
-
-});
+})
 
 scene.add(pointerLockControls.getObject());
 
@@ -598,31 +564,23 @@ function playerCollisions() {
     playerOnFloor = false;
 
     if ( result ) {
-
         playerOnFloor = result.normal.y > 0;
 
         if (!playerOnFloor) {
-
             playerVelocity.addScaledVector(result.normal, - result.normal.dot(playerVelocity));
-
         }
 
         playerCollider.translate(result.normal.multiplyScalar(result.depth));
 
-        if (playerOnRaft) {
-    
+        if (playerOnRaft) {    
             camera.position.y = playerCollider.end.y + raft.position.y
-    
             if (!escaped) gameEnd()
-    
+
         } else if (playerOnWater) {
-    
             const t = ocean.material.uniforms['time'].value;
             const waveInfo = getWaveInfo(playerCollider.end.x, playerCollider.end.z, t)
             camera.position.y = ocean.position.y + waveInfo.position.y + 0.2
-            
         }
-
     }
 
 }
@@ -644,11 +602,8 @@ function updatePlayer(deltaTime) {
     let damping = Math.exp(- 4 * deltaTime) - 1;
 
     if (!playerOnFloor) {
-
         playerVelocity.y -= GRAVITY * deltaTime;
-
         damping *= 0.1; // small air resistance
-
     }
 
     playerVelocity.addScaledVector(playerVelocity, damping);
@@ -689,40 +644,23 @@ function controls(deltaTime) {
     const speedDelta = deltaTime * (playerOnFloor ? 100 : 20) / STEPS_PER_FRAME;
 
     if (keyStates["ArrowUp"] || keyStates['KeyW'] || mouseButtonsStates[0]) {
-
-        playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
-
+        playerVelocity.add(getForwardVector().multiplyScalar(speedDelta))
     }
-
     if (keyStates["ArrowDown"] || keyStates['KeyS'] || mouseButtonsStates[1]) {
-
-        playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta));
-
+        playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta))
     }
-
     if (keyStates["ArrowLeft"] || keyStates['KeyA']) {
-
-        playerVelocity.add(getSideVector().multiplyScalar(- speedDelta));
-
+        playerVelocity.add(getSideVector().multiplyScalar(- speedDelta))
     }
-
     if (keyStates["ArrowRight"] || keyStates['KeyD']) {
-
-        playerVelocity.add(getSideVector().multiplyScalar(speedDelta));
-
+        playerVelocity.add(getSideVector().multiplyScalar(speedDelta))
     }
-
     if (playerOnFloor && jumping == false) {
-
         if (keyStates['Space']) {
-
             playerVelocity.y = 9;
             jumping = true
-
         }
-
     }
-
 }
 
 function getWaveInfo(x, z, time) {
@@ -731,7 +669,6 @@ function getWaveInfo(x, z, time) {
     const tangent = new THREE.Vector3(1, 0, 0);
     const binormal = new THREE.Vector3(0, 0, 1);
     Object.keys(waves).forEach((wave) => {
-
         const w = waves[wave];
         const k = (Math.PI * 2) / w.wavelength;
         const c = Math.sqrt(9.8 / k);
@@ -753,8 +690,7 @@ function getWaveInfo(x, z, time) {
         binormal.x += - d.x * d.y * (w.steepness * Math.sin(f));
         binormal.y += d.y * (w.steepness * Math.cos(f));
         binormal.z += - d.y * d.y * (w.steepness * Math.sin(f));
-
-    });
+    })
 
     const normal = binormal.cross(tangent).normalize();
 
