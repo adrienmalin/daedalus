@@ -7,7 +7,7 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
-import 'three-hex-tiling';
+//import 'three-hex-tiling';
 
 import MazeMesh from './MazeMesh.js';
 
@@ -118,7 +118,6 @@ scene.add(maze)
 console.log(String(maze))
 
 if (!dev) {
-
     const invisibleWall = new THREE.Mesh(new THREE.BoxGeometry( .9, 1.8, .9 ));
     invisibleWall.material.visible = false;
     let matrix = new THREE.Matrix4()
@@ -130,54 +129,27 @@ if (!dev) {
         clone.position.y = 1;
         mazeCollisionner.add(clone);
     }
-
 }
 
 // Ground
 
 const groundGeometry = new THREE.BoxGeometry(mazeWidth, mazeWidth, 20)
+function repeatGroundMaterial (texture) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
+}
 const groundMaterial = new THREE.MeshStandardMaterial({
-    map: loader.load(
-        'textures/angled-blocks-vegetation/albedo.png',
-        texture => {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
-        }
-    ),
-    aoMap: loader.load(
-        'textures/angled-blocks-vegetation/ao-roughness-metalness.png',
-        texture => {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
-        }
-    ),
-    metalnessMap: loader.load(
-        'textures/angled-blocks-vegetation/ao-roughness-metalness.png',
-        texture => {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
-        }
-    ),
-    normalMap: loader.load(
-        'textures/angled-blocks-vegetation/normal-dx.png',
-        texture => {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
-        }
-    ),
-    roughnessMap: loader.load(
-        'textures/angled-blocks-vegetation/ao-roughness-metalness.png',
-        texture => {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-            texture.repeat.set(mazeWidth / 2, mazeWidth / 2)
-        }
-    ),
-    hexTiling: {
+    map         : loader.load('textures/angled-blocks-vegetation/albedo.png', repeatGroundMaterial),
+    aoMap       : loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.png', repeatGroundMaterial),
+    metalnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.png', repeatGroundMaterial),
+    normalMap   : loader.load('textures/angled-blocks-vegetation/normal-dx.png', repeatGroundMaterial),
+    roughnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.png', repeatGroundMaterial),
+    /*hexTiling   : {
         patchScale: 1,
         useContrastCorrectedBlending: true,
         lookupSkipThreshold: 0.01,
         textureSampleCoefficientExponent: 32,
-    }
+    }*/
 })
 
 const sideGroundMaterial = new THREE.MeshStandardMaterial({
@@ -189,16 +161,16 @@ const sideGroundMaterial = new THREE.MeshStandardMaterial({
 	roughness        : 1,
 })
 sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
 sideGroundMaterial.map.repeat.set(mazeWidth, 20)
-sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
-sideGroundMaterial.aoMap.repeat.set(mazeWidth, 20)
-sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
 sideGroundMaterial.map.rotation = Math.PI
+sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
 sideGroundMaterial.normalMap.rotation = Math.PI
+sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.aoMap.repeat.set(mazeWidth, 20)
 sideGroundMaterial.aoMap.rotation = Math.PI
+sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
 sideGroundMaterial.roughnessMap.rotation = Math.PI
 
 const ground = new THREE.Mesh(
@@ -288,7 +260,7 @@ const oceanOctree  = new Octree().fromGraphNode(ocean);
 
 const sun = new THREE.Vector3();
 
-const ambientLight = new THREE.AmbientLight(0x404040, 7);
+const ambientLight = new THREE.AmbientLight(0x404040, 5);
 scene.add(ambientLight);
 
 const sunLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -325,31 +297,20 @@ function updateSun() {
 // Raft
 
 const raftGeometry = new THREE.BoxGeometry(1.8, .1, 1.1, 1, 1, 16)
+function repeatRaftMaterial(texture) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(2, 1)
+}
 const raftMaterial = new THREE.MeshStandardMaterial({
-    map: loader.load("textures/Poly-wood/color_map.jpg", texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(2, 1)
-    }),
-    aoMap: loader.load("textures/Poly-wood/ao_map.jpg", texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(2, 1)
-    }),
-    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.jpg", texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(2, 1)
-    }),
+    map: loader.load("textures/Poly-wood/color_map.jpg", repeatRaftMaterial),
+    aoMap: loader.load("textures/Poly-wood/ao_map.jpg", repeatRaftMaterial),
+    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.jpg", repeatRaftMaterial),
     normalScale : new THREE.Vector2(2, 2),
-    roughnessMap: loader.load("textures/Poly-wood/roughness_map.jpg", texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(2, 1)
-    }),
+    roughnessMap: loader.load("textures/Poly-wood/roughness_map.jpg", repeatRaftMaterial),
     depthFunc: 3,
     depthTest: true,
     depthWrite: true,
-    displacementMap: loader.load("textures/Poly-wood/displacement_map.jpg", texture => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-        texture.repeat.set(2, 1)
-    }),
+    displacementMap: loader.load("textures/Poly-wood/displacement_map.jpg", repeatRaftMaterial),
     displacementScale: -0.3,
     displacementBias: 0.15,
 })
@@ -480,14 +441,22 @@ if (dev) {
         });
     waveCFolder.open();
 
-    const HexTilingFolder = gui.addFolder('Hex Tiling')
-    const groundMaterialFolder = HexTilingFolder.addFolder("ground")
-    groundMaterialFolder.add(groundMaterial.hexTiling, "patchScale", 0, 10)
-    groundMaterialFolder.add(groundMaterial.hexTiling, "useContrastCorrectedBlending")
-    groundMaterialFolder.add(groundMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
-    groundMaterialFolder.add(groundMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
-    HexTilingFolder.close()
-
+    const hexTilingFolder = gui.addFolder('Hex Tiling')
+    if (wallMaterial?.hexTiling?.patchScale) {
+        const wallMaterialFolder = hexTilingFolder.addFolder("wall")
+        wallMaterialFolder.add(wallMaterial.hexTiling, "patchScale", 0, 10)
+        wallMaterialFolder.add(wallMaterial.hexTiling, "useContrastCorrectedBlending")
+        wallMaterialFolder.add(wallMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
+        wallMaterialFolder.add(wallMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
+    }
+    if (groundMaterial?.hexTiling?.patchScale) {
+        const groundMaterialFolder = hexTilingFolder.addFolder("ground")
+        groundMaterialFolder.add(groundMaterial.hexTiling, "patchScale", 0, 10)
+        groundMaterialFolder.add(groundMaterial.hexTiling, "useContrastCorrectedBlending")
+        groundMaterialFolder.add(groundMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
+        groundMaterialFolder.add(groundMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
+    }
+    hexTilingFolder.close()
 }
 
 //
