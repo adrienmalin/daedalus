@@ -80,12 +80,12 @@ const scene = new THREE.Scene();
 scene.background = new THREE.CubeTextureLoader(loadMngr)
     .setPath( 'textures/calm-sea-skybox/' )
     .load( [
-        'ft.jpg',
-        'bk.jpg',
-        'up.jpg',
-        'dn.jpg',
-        'rt.jpg',
-        'lf.jpg',
+        'ft.avif',
+        'bk.avif',
+        'up.avif',
+        'dn.avif',
+        'rt.avif',
+        'lf.avif',
     ] );
 scene.backgroundBlurriness = 0.03;
 scene.backgroundIntensity  = 1.4;
@@ -102,10 +102,10 @@ const mazeCollisionner = new THREE.Group();
 // Maze
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-    map            : loader.load('textures/Poly-cobblestone-wall/color_map.jpg'),
-    normalMap      : loader.load('textures/Poly-cobblestone-wall/normal_map_opengl.jpg'),
-	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.jpg'),
-	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.jpg'),
+    map            : loader.load('textures/Poly-cobblestone-wall/color_map.avif'),
+    normalMap      : loader.load('textures/Poly-cobblestone-wall/normal_map_opengl.avif'),
+	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.avif'),
+	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.avif'),
 	roughness      : 1
 })
 
@@ -139,11 +139,11 @@ function repeatGroundMaterial (texture) {
     texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
 }
 const groundMaterial = new THREE.MeshStandardMaterial({
-    map         : loader.load('textures/angled-blocks-vegetation/albedo.png', repeatGroundMaterial),
-    aoMap       : loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.png', repeatGroundMaterial),
-    metalnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.png', repeatGroundMaterial),
-    normalMap   : loader.load('textures/angled-blocks-vegetation/normal-dx.png', repeatGroundMaterial),
-    roughnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.png', repeatGroundMaterial),
+    map         : loader.load('textures/angled-blocks-vegetation/albedo.avif', repeatGroundMaterial),
+    aoMap       : loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.avif', repeatGroundMaterial),
+    metalnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.avif', repeatGroundMaterial),
+    normalMap   : loader.load('textures/angled-blocks-vegetation/normal-dx.avif', repeatGroundMaterial),
+    roughnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.avif', repeatGroundMaterial),
     /*hexTiling   : {
         patchScale: 1,
         useContrastCorrectedBlending: true,
@@ -204,7 +204,7 @@ const ocean = new Water(waterGeometry, {
     textureWidth : 512,
     textureHeight: 512,
     waterNormals : loader.load(
-        'textures/waternormals.jpg',
+        'textures/waternormals.avif',
         function (texture) {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }
@@ -302,15 +302,15 @@ function repeatRaftMaterial(texture) {
     texture.repeat.set(2, 1)
 }
 const raftMaterial = new THREE.MeshStandardMaterial({
-    map: loader.load("textures/Poly-wood/color_map.jpg", repeatRaftMaterial),
-    aoMap: loader.load("textures/Poly-wood/ao_map.jpg", repeatRaftMaterial),
-    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.jpg", repeatRaftMaterial),
+    map: loader.load("textures/Poly-wood/color_map.avif", repeatRaftMaterial),
+    aoMap: loader.load("textures/Poly-wood/ao_map.avif", repeatRaftMaterial),
+    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.avif", repeatRaftMaterial),
     normalScale : new THREE.Vector2(2, 2),
-    roughnessMap: loader.load("textures/Poly-wood/roughness_map.jpg", repeatRaftMaterial),
+    roughnessMap: loader.load("textures/Poly-wood/roughness_map.avif", repeatRaftMaterial),
     depthFunc: 3,
     depthTest: true,
     depthWrite: true,
-    displacementMap: loader.load("textures/Poly-wood/displacement_map.jpg", repeatRaftMaterial),
+    displacementMap: loader.load("textures/Poly-wood/displacement_map.avif", repeatRaftMaterial),
     displacementScale: -0.3,
     displacementBias: 0.15,
 })
