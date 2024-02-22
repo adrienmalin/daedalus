@@ -1,15 +1,15 @@
-import * as THREE from 'three';
-import { Octree } from 'three/addons/math/Octree.js';
-import { Capsule } from 'three/addons/math/Capsule.js';
-import { Water } from 'three/addons/objects/Water.js';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
-import Stats from 'three/addons/libs/stats.module.js';
+import * as THREE from 'three'
+import { Octree } from 'three/addons/math/Octree.js'
+import { Capsule } from 'three/addons/math/Capsule.js'
+import { Water } from 'three/addons/objects/Water.js'
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
+import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js'
+import Stats from 'three/addons/libs/stats.module.js'
 
-//import 'three-hex-tiling';
+//import 'three-hex-tiling'
 
-import MazeMesh from './MazeMesh.js';
+import MazeMesh from './MazeMesh.js'
 
 
 const playerHeight = 0.5;
@@ -80,12 +80,12 @@ const scene = new THREE.Scene();
 scene.background = new THREE.CubeTextureLoader(loadMngr)
     .setPath( 'textures/calm-sea-skybox/' )
     .load( [
-        'ft.avif',
-        'bk.avif',
-        'up.avif',
-        'dn.avif',
-        'rt.avif',
-        'lf.avif',
+        'ft.webp',
+        'bk.webp',
+        'up.webp',
+        'dn.webp',
+        'rt.webp',
+        'lf.webp',
     ] );
 scene.backgroundBlurriness = 0.03;
 scene.backgroundIntensity  = 1.4;
@@ -102,10 +102,10 @@ const mazeCollisionner = new THREE.Group();
 // Maze
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-    map            : loader.load('textures/Poly-cobblestone-wall/color_map.avif'),
-    normalMap      : loader.load('textures/Poly-cobblestone-wall/normal_map_opengl.avif'),
-	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.avif'),
-	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.avif'),
+    map            : loader.load('textures/Poly-cobblestone-wall/color_map.webp'),
+    normalMap      : loader.load('textures/Poly-cobblestone-wall/normal_map_opengl.webp'),
+	aoMap          : loader.load('textures/Poly-cobblestone-wall/ao_map.webp'),
+	roughnessMap   : loader.load('textures/Poly-cobblestone-wall/roughness_map.webp'),
 	roughness      : 1
 })
 
@@ -139,11 +139,11 @@ function repeatGroundMaterial (texture) {
     texture.repeat.set(mazeWidth / 4, mazeWidth / 4)
 }
 const groundMaterial = new THREE.MeshStandardMaterial({
-    map         : loader.load('textures/angled-blocks-vegetation/albedo.avif', repeatGroundMaterial),
-    aoMap       : loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.avif', repeatGroundMaterial),
-    metalnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.avif', repeatGroundMaterial),
-    normalMap   : loader.load('textures/angled-blocks-vegetation/normal-dx.avif', repeatGroundMaterial),
-    roughnessMap: loader.load('textures/angled-blocks-vegetation/ao-roughness-metalness.avif', repeatGroundMaterial),
+    map         : loader.load('textures/angled-blocks-vegetation/albedo.webp', repeatGroundMaterial),
+    aoMap       : loader.load('textures/angled-blocks-vegetation/ao.webp', repeatGroundMaterial),
+    metalnessMap: loader.load('textures/angled-blocks-vegetation/metallic.webp', repeatGroundMaterial),
+    normalMap   : loader.load('textures/angled-blocks-vegetation/normal-dx.webp', repeatGroundMaterial),
+    roughnessMap: loader.load('textures/angled-blocks-vegetation/roughness.webp', repeatGroundMaterial),
     /*hexTiling   : {
         patchScale: 1,
         useContrastCorrectedBlending: true,
@@ -204,7 +204,7 @@ const ocean = new Water(waterGeometry, {
     textureWidth : 512,
     textureHeight: 512,
     waterNormals : loader.load(
-        'textures/waternormals.avif',
+        'textures/waternormals.webp',
         function (texture) {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }
@@ -302,15 +302,15 @@ function repeatRaftMaterial(texture) {
     texture.repeat.set(2, 1)
 }
 const raftMaterial = new THREE.MeshStandardMaterial({
-    map: loader.load("textures/Poly-wood/color_map.avif", repeatRaftMaterial),
-    aoMap: loader.load("textures/Poly-wood/ao_map.avif", repeatRaftMaterial),
-    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.avif", repeatRaftMaterial),
+    map: loader.load("textures/Poly-wood/color_map.webp", repeatRaftMaterial),
+    aoMap: loader.load("textures/Poly-wood/ao_map.webp", repeatRaftMaterial),
+    normalMap: loader.load("textures/Poly-wood/normal_map_opengl.webp", repeatRaftMaterial),
     normalScale : new THREE.Vector2(2, 2),
-    roughnessMap: loader.load("textures/Poly-wood/roughness_map.avif", repeatRaftMaterial),
+    roughnessMap: loader.load("textures/Poly-wood/roughness_map.webp", repeatRaftMaterial),
     depthFunc: 3,
     depthTest: true,
     depthWrite: true,
-    displacementMap: loader.load("textures/Poly-wood/displacement_map.avif", repeatRaftMaterial),
+    displacementMap: loader.load("textures/Poly-wood/displacement_map.webp", repeatRaftMaterial),
     displacementScale: -0.3,
     displacementBias: 0.15,
 })
