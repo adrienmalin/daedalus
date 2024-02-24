@@ -93,7 +93,7 @@ scene.environment = scene.background;
 
 window.scene = scene;
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 25 + playerHeight, 0);
 
@@ -345,6 +345,11 @@ if (dev) {
         octreeHelper.visible = value;
 
     });
+
+    const cameraFolder = gui.addFolder("camera")
+    cameraFolder.add(camera, "focus",     0, 200).onChange(() => camera.updateProjectionMatrix())
+    cameraFolder.add(camera, "fov",       0, 200).onChange(() => camera.updateProjectionMatrix())
+    cameraFolder.add(camera, "filmGauge", 0, 200).onChange(() => camera.updateProjectionMatrix())
 
     const raftFolder = gui.addFolder("Raft")
     const raftPositionFolder = raftFolder.addFolder("position")
