@@ -19,27 +19,29 @@ body {
 }
 
 #labyTable {
-    width: 230px;
-    height: 230px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20vh;
-    margin-bottom: 5vh;
-    border-collapse: collapse;
+  width: 230px;
+  height: 230px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20vh;
+  margin-bottom: 5vh;
+  border-collapse: collapse;
 }
 
-td {
-    width: 10px;
-    height: 10px;
-    transition: background-color 1s;
+#labyTable td {
+  width: 10px;
+  height: 10px;
+  transition: background-color 1s;
+  border: 0;
+  padding: 0;
 }
 
 .wall {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 .ground {
-    background-color: #214464;
+  background-color: #214464;
 }
 
 #container {

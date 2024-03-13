@@ -14,13 +14,13 @@ import MazeMesh from './MazeMesh.js'
 
 // LOADING
 
-const labyWidth =23
+const labyWidth = 23
 const labyHeight = 23
 
 for(let y=0; y < labyHeight; y++) {
     let tr = document.createElement("tr")
     labyTable.appendChild(tr)
-    for(let x=0; x < labyHeight; x++) {
+    for(let x=0; x < labyWidth; x++) {
         let td = document.createElement("td")
         tr.appendChild(td)
     }
@@ -30,7 +30,7 @@ let walls
 
 function dig(x, y) {
     walls[y][x] = false
-    window.requestAnimationFrame(() => labyTable.children[y].children[x].className = "ground")
+    labyTable.children[y].children[x].className = "ground"
 }
 
 const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
@@ -60,9 +60,7 @@ function* endlessLaby() {
         }
 
         walls = Array(labyHeight).fill(true).map(row => Array(labyWidth).fill(true))
-
-        //let x0 = 2 * Math.floor(labyWidth * Math.random() / 2) + 1
-        //let y0 = 2 * Math.floor(labyHeight * Math.random() / 2) + 1
+        
         let x0 = Math.floor(labyWidth / 2)
         let y0 = Math.floor(labyHeight / 2)
 
@@ -79,8 +77,10 @@ let interval = window.setInterval(() => labyIterator.next(), 200)
 const loadMngr = new THREE.LoadingManager()
 const loader = new THREE.TextureLoader(loadMngr)
 loader.setPath("textures/")
+let t0
 loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
 	progress.innerText = "0"
+    t0 = Date.now()
 }
 loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
 	progress.innerText = Math.floor(100 * itemsLoaded / itemsTotal)
