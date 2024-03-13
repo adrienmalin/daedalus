@@ -143,15 +143,17 @@
 		</script>
 	</head>
 	<body>
-		<div id="container"></div>
-		<span id="message" class="loading">
-			<div id="progressCircle" style="--progress: 0deg;">0%</div>
+		<div id="loading">
+			<table id="labyTable"></table>
+			<div id="loadingMessage">Construction du labyrinthe : <span id="progress">0</span>%</div>
 			<div>
 				Se déplacer : ↑←↓→, ZQSD ou clic<br/>
 				Sauter : ESPACE<br/>
 				Regarder : Souris
 			</div>
-		</span>
+		</div>
+		<div id="container"></div>
+		<span id="message"></span>
 
 		<script type="module" src="./main.js"></script>
 	</body>
