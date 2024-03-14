@@ -12,20 +12,36 @@ body {
   font-size: 1.3em;
   top: 20vh;
   margin: auto;
+  font-family: sans-serif;
 }
 
 #loadingMessage {
   margin-bottom: 0.5em;
 }
 
-#labyTable {
+#labyShadow {
   width: 230px;
   height: 230px;
   margin-left: auto;
   margin-right: auto;
   margin-top: 20vh;
   margin-bottom: 5vh;
+  filter: drop-shadow(0px 10px 0px #0c1c2b);
+}
+
+@keyframes rotation {
+  from {
+    transform: rotateZ(0deg);
+  }
+
+  to {
+    transform: rotateZ(360deg);
+  }
+}
+
+#labyTable {
   border-collapse: collapse;
+  animation: rotation 60s infinite;
 }
 
 #labyTable td {
@@ -70,7 +86,7 @@ body {
   justify-content: center;
   z-index: 1;
   color: gray;
-  font-family: Times, "Times New Roman", Georgia, serif;
+  font-family: serif;
 }
 
 #message a {

@@ -69,18 +69,17 @@ function* endlessLaby() {
     }
 }
 
-let labyIterator = endlessLaby()
-
-let interval = window.setInterval(() => labyIterator.next(), 200)
-
+let interval
 
 const loadMngr = new THREE.LoadingManager()
 const loader = new THREE.TextureLoader(loadMngr)
 loader.setPath("textures/")
-let t0
+
 loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
 	progress.innerText = "0"
-    t0 = Date.now()
+
+    let labyIterator = endlessLaby()
+    interval = window.setInterval(() => labyIterator.next(), 200)
 }
 loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
 	progress.innerText = Math.floor(100 * itemsLoaded / itemsTotal)
@@ -203,10 +202,10 @@ function repeatGroundMaterial (texture) {
 }
 const groundMaterial = new THREE.MeshStandardMaterial({
     map         : loader.load('angled-blocks-vegetation/albedo.webp', repeatGroundMaterial),
-    aoMap       : loader.load('angled-blocks-vegetation/ao.webp', repeatGroundMaterial),
-    metalnessMap: loader.load('angled-blocks-vegetation/metallic.webp', repeatGroundMaterial),
+    aoMap       : loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
+    metalnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
     normalMap   : loader.load('angled-blocks-vegetation/normal-dx.webp', repeatGroundMaterial),
-    roughnessMap: loader.load('angled-blocks-vegetation/roughness.webp', repeatGroundMaterial),
+    roughnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
     /*hexTiling   : {
         patchScale: 1,
         useContrastCorrectedBlending: true,
