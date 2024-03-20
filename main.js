@@ -14,13 +14,13 @@ import MazeMesh from './MazeMesh.js'
 
 // LOADING
 
-const labyWidth = 23
-const labyHeight = 23
+const loadingMazeWidth = 23
+const loadingMazeHeight = 23
 
-for(let y=0; y < labyHeight; y++) {
+for(let y=0; y < loadingMazeHeight; y++) {
     let tr = document.createElement("tr")
-    labyTable.appendChild(tr)
-    for(let x=0; x < labyWidth; x++) {
+    loadingMazeTable.appendChild(tr)
+    for(let x=0; x < loadingMazeWidth; x++) {
         let td = document.createElement("td")
         tr.appendChild(td)
     }
@@ -30,7 +30,7 @@ let walls
 
 function dig(x, y) {
     walls[y][x] = false
-    labyTable.children[y].children[x].className = "ground"
+    loadingMazeTable.children[y].children[x].className = "ground"
 }
 
 const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
@@ -41,7 +41,7 @@ function* build(x, y) {
         let y1 = y + dy
         let x2 = x1 + dx
         let y2 = y1 + dy
-        if (0 <= x2 && x2 < labyWidth && 0 <= y2 && y2 < labyHeight && walls[y2][x2]) {
+        if (0 <= x2 && x2 < loadingMazeWidth && 0 <= y2 && y2 < loadingMazeHeight && walls[y2][x2]) {
             dig(x1, y1)
             yield x1, y1
             dig(x2, y2)
@@ -51,18 +51,18 @@ function* build(x, y) {
     }
 }
 
-function* endlessLaby() {
+function* endlessLoadingMaze() {
     while (true) {
-        for (const tr of labyTable.children) {
+        for (const tr of loadingMazeTable.children) {
             for (const td of tr.children) {
                 td.className = "wall"
             }
         }
 
-        walls = Array(labyHeight).fill(true).map(row => Array(labyWidth).fill(true))
+        walls = Array(loadingMazeHeight).fill(true).map(row => Array(loadingMazeWidth).fill(true))
         
-        let x0 = Math.floor(labyWidth / 2)
-        let y0 = Math.floor(labyHeight / 2)
+        let x0 = Math.floor(loadingMazeWidth / 2)
+        let y0 = Math.floor(loadingMazeHeight / 2)
 
         dig(x0, y0)
         yield* build(x0, y0)
@@ -78,8 +78,8 @@ loader.setPath("textures/")
 loadMngr.onStart = function (url, itemsLoaded, itemsTotal) {
 	progress.innerText = "0"
 
-    let labyIterator = endlessLaby()
-    interval = window.setInterval(() => labyIterator.next(), 200)
+    let loadingMazeIterator = endlessLoadingMaze()
+    interval = window.setInterval(() => loadingMazeIterator.next(), 200)
 }
 loadMngr.onProgress = function (url, itemsLoaded, itemsTotal) {
 	progress.innerText = Math.floor(100 * itemsLoaded / itemsTotal)

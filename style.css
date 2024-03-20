@@ -30,7 +30,7 @@ body {
   }
 }
 
-#labyShadow {
+#loadingMazeShadow {
   width: 230px;
   height: 230px;
   margin-left: auto;
@@ -49,13 +49,13 @@ body {
   }
 }
 
-#labyTable {
+#loadingMazeTable {
   border-collapse: collapse;
   animation: rotation 60s infinite;
   border: none;
 }
 
-#labyTable td {
+#loadingMazeTable td {
   width: 10px;
   height: 10px;
   transition: background-color 1s;
