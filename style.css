@@ -19,6 +19,17 @@ body {
   margin-bottom: 0.5em;
 }
 
+@keyframes perspective {
+  from {
+    transform: rotateX(0deg) perspective(0px);
+    filter: drop-shadow(0px 00px 0px #0f2437);
+  }
+  to {
+    transform: rotateX(40deg) perspective(150px);
+    filter: drop-shadow(0px 10px 0px #0f2437);
+  }
+}
+
 #labyShadow {
   width: 230px;
   height: 230px;
@@ -26,15 +37,13 @@ body {
   margin-right: auto;
   margin-top: 20vh;
   margin-bottom: 5vh;
-  filter: drop-shadow(0px 10px 0px #0f2437);
-  transform: rotateX(40deg) perspective(150px);
+  animation: perspective 60s infinite;
 }
 
 @keyframes rotation {
   from {
     transform: rotateZ(0deg);
   }
-
   to {
     transform: rotateZ(360deg);
   }
@@ -43,13 +52,14 @@ body {
 #labyTable {
   border-collapse: collapse;
   animation: rotation 60s infinite;
+  border: none;
 }
 
 #labyTable td {
   width: 10px;
   height: 10px;
   transition: background-color 1s;
-  border: 0;
+  border: none;
   padding: 0;
 }
 
