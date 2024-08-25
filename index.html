@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>Angry notes from outer space</title>
+        <link rel="icon" href="img/favicon.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+        <link href="https://unpkg.com/nes.css@2.3.0/css/nes.css" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+        <script src="http://unpkg.com/tone"></script>
+        <script src="https://unpkg.com/@tonejs/midi"></script>
+    </head>
+    <body>
+        <section class="nes-container is-dark" style="padding: 0;">
+            <canvas style="background-image: url(img/pixel-city-chill.gif); background-size: cover;" id="canvas" width="960" height="540" tabindex="9"></canvas>
+        </section>
+        <dialog id="startDialog" class="nes-dialog is-rounded is-dark">
+            <form method="dialog">
+                <h1 class="title is-centered">Angry notes from outer space</h1>
+                <div style="display: flex;gap: 2rem;align-items: end;">
+                    <div>
+                        <p>Jean-Michel, les notes furieuses de l'espace attaquent&nbsp;! Détruisez-les à l'aide de votre harpe laser.</p>
+                        <p>Ce jeu est conçu pour un clavier MIDI. Si vous en avez un, branchez-le maintenant.</p>
+                    </div>
+                    <img src="img/notes.png">
+                </div>
+                <div class="is-centered">
+                    <button class="nes-btn is-primary">Continuer</button>
+                </div>
+            </form>
+        </dialog>
+        <dialog id="settingsDialog" class="nes-dialog is-rounded is-dark">
+            <form method="dialog">
+                <h2 class="title is-centered">Options</h2>
+                <section class="nes-container with-title is-dark">
+                    <h3 class="title">Contrôles</h3>
+                    <div class="nes-field">
+                        <label for="keyMapInput">
+                            Clavier d'ordinateur
+                            <label for="keyMapInput" style="padding: 0 2em 0 1em; margin: 0 6px;">C  C♯ D  D♯ E  F  F♯ G  G♯ A  A♯ B  C  C♯ D  D♯ E  F  F♯ G  G♯ A  A♯ B  C</label>
+                            <textarea id="keyMapInput" class="nes-textarea is-dark" minlength="25" maxlength="25" cols="25" required
+                                style="text-transform: uppercase; letter-spacing: 1.6em;"
+                                placeholder="wsxdcvgbhnj,e'r(tyèu_içop" autocomplete="off" autocorrect="off" spellcheck="false">wsxdcvgbhnj,e'r(tyèu_içop</textarea>
+                            </label>
+                    </div>
+                    <label for="midiSelect" style="color:#fff">Clavier MIDI</label>
+                    <div class="nes-select is-dark">
+                        <select id="midiSelect">
+                            <option value="">Aucun</option>
+                        </select>
+                    </div>
+                </section>
+                <section class="nes-container with-title is-dark">
+                    <h3 class="title">Son</h3>
+                    <div class="nes-field sliders">
+                        <label><input type="range" id="volRange"   min="0" max="1"   step="any" value="0.400" orient="vertical" onmousedown="playNote(57)" onmouseup="stopNote(57)">Vol</label>
+                        <label><input type="range" id="modRange"   min="0" max="100" step="any" value="45.00" orient="vertical" onmousedown="playNote(57)" onmouseup="stopNote(57)">Mod</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.200" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">1f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">2f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.200" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">3f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">4f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">5f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">6f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">7f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">8f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">9f</label>
+                        <label><input type="range" class="partial" min="0" max="0.2" step="any" value="0.000" orient="vertical" oninput="onpartialinput()" onmousedown="playNote(57)" onmouseup="stopNote(57)">10f</label>
+                    </div>
+                </section>
+                <menu class="is-centered">
+                    <button id="playButton" class="nes-btn is-primary" tabindex="1">OK</button>
+                </menu>
+            </form>
+        </dialog>
+        <dialog id="levelDialog" class="nes-dialog is-rounded is-dark">
+            <form method="dialog">
+                <h2 id="levelTitle" class="title is-centered">Niveau X</h2>
+                <h3 id="songNameTitle" class="title is-centered">Titre</h3>
+                <div class="is-centered">
+                    <button class="nes-btn is-primary" tabindex="1">Jouer</button>
+                </div>
+            </form>
+        </dialog>
+        <button id="settingsButton" type="button" class="nes-btn">
+            <span>
+                <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm16 5H4v2h16v-2z" fill="currentColor"></path></svg>
+            </span>
+        </button>
+        <script src="app.js"></script>
+    </body>
+</html>

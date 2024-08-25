@@ -1,0 +1,157 @@
+html, body, pre, code, kbd, samp {
+    font-family: "Press Start 2P", monospace;;
+}
+
+body {
+    background-color: #212529;
+    font-size: 12;
+    display: flex;
+    align-content: center;
+    height: 100vh;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+body::before,
+.nes-dialog::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-image: repeating-linear-gradient(#0004, #0004 1px, transparent 1px, transparent 2px);
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+.nes-dialog {
+    max-width: 90%;
+}
+
+h1 {
+    text-shadow: 0 4px #adafbc;
+}
+
+.is-centered {
+    text-align: center;
+}
+
+textarea {
+    padding-right: 0;
+}
+
+.sliders {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.sliders label {
+    display: flex;
+    flex-flow: column;
+    margin: 5px;
+    align-items: center;
+    gap: 9px;
+}
+
+input[type=range][orient=vertical] {
+    -webkit-appearance: slider-vertical;
+    width: 4px;
+    height: 100px;
+}
+
+input[type=range] {
+    padding: 0;
+    width: 3px;
+}
+
+input[type=range]::-moz-range-thumb {
+    border-radius: 0;
+    border: 3px solid white;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border-radius: 0;
+    border: 3px solid white;
+}
+
+input[type=range]::-ms-thumb {
+    border-radius: 0;
+    border: 3px solid white;
+}
+
+input[type=range]::-moz-range-thumb {
+    background: white;
+    border: white !important;
+}
+
+input[type=range]::-moz-range-track {
+    background: transparent;
+    width: 3px;
+    border-left: 0;
+    border-top: 3px solid white;
+    border-bottom: 3px solid white;
+    border-radius: 0;
+    padding: -0 7px;
+    background-image: linear-gradient(white);
+}
+      
+input[type=range]::-webkit-slider-runnable-track {
+    background: transparent;
+    width: 3px;
+    border-left: 0;
+    border-top: 3px solid white;
+    border-bottom: 3px solid white;
+    border-radius: 0;
+    padding: -0 7px;
+    background-image: linear-gradient(white);
+}
+      
+input[type=range]::-ms-track {
+    background: transparent;
+    width: 3px;
+    border-left: 0;
+    border-top: 3px solid white;
+    border-bottom: 3px solid white;
+    border-radius: 0;
+    padding: -0 7px;
+    background-image: linear-gradient(white);
+}
+
+#settingsButton {
+    position: fixed;
+    bottom: 25px;
+    right: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,.6);
+}
+
+svg {
+    width: 32px;
+    height: 32px;
+}
+
+.nes-balloon, .nes-balloon.is-dark, .nes-btn, .nes-container.is-rounded, .nes-container.is-rounded.is-dark, .nes-dialog.is-rounded, .nes-dialog.is-rounded.is-dark, .nes-progress, .nes-progress.is-rounded, .nes-table.is-bordered, .nes-table.is-dark.is-bordered, .nes-input, .nes-textarea, .nes-select select {
+    border-style: solid;
+    border-width: 2px;
+    border-image-outset: 2;
+}
+
+.nes-btn {
+    padding: 4px 6px;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 2px 2px #adafbc;
+}
+
+.nes-btn:hover::after {
+    box-shadow: inset -2px -2px #adafbc;
+}
+
+.nes-btn::after {
+    box-shadow: inset -2px -2px #adafbc;
+}
