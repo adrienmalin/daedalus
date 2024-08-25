@@ -19,9 +19,9 @@ body::before,
     position: absolute;
     left: 0;
     top: 0;
+    right: 0;
+    bottom: 0;
     background-image: repeating-linear-gradient(#0004, #0004 1px, transparent 1px, transparent 2px);
-    width: 100vw;
-    height: 100vh;
     z-index: 2;
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
