@@ -385,7 +385,7 @@ async function nextLevel() {
     noteSprites = []
     midiSong.tracks.forEach(track => {
         //console.log(track.name)
-        track.notes.forEach(note => {
+        track.notes.filter(note => FIRST_NOTE <= note.midi && note.midi <= LAST_NOTE).forEach(note => {
             let noteSprite
             let durationInQuarter = note.durationTicks / midiSong.header.ppq
             if (durationInQuarter <= 0.25) noteSprite = new Sixteenth(canvasCtx, note.midi, 1000*note.duration)
