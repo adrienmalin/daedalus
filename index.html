@@ -19,7 +19,7 @@
         <dialog id="startDialog" class="nes-dialog is-rounded is-dark">
             <form method="dialog">
                 <h1 class="title is-centered">Angry notes from outer space</h1>
-                <div style="display: flex;gap: 2rem;align-items: end;">
+                <div style="display: flex; gap: 2rem; align-items: end;">
                     <div>
                         <p>Jean-Michel, les notes furieuses de l'espace attaquent&nbsp;! Détruisez-les à l'aide de votre harpe laser.</p>
                         <p>Ce jeu est conçu pour un clavier MIDI. Si vous en avez un, branchez-le maintenant.</p>
@@ -37,13 +37,12 @@
                 <section class="nes-container with-title is-dark">
                     <h3 class="title">Contrôles</h3>
                     <div class="nes-field">
-                        <label for="keyMapInput">
-                            Clavier d'ordinateur
-                            <label for="keyMapInput" style="padding: 0 2em 0 1em; margin: 0 6px;">C  C♯ D  D♯ E  F  F♯ G  G♯ A  A♯ B  C  C♯ D  D♯ E  F  F♯ G  G♯ A  A♯ B  C</label>
-                            <textarea id="keyMapInput" class="nes-textarea is-dark" minlength="25" maxlength="25" cols="25" required
-                                style="text-transform: uppercase; letter-spacing: 1.6em;"
-                                placeholder="wsxdcvgbhnj,e'r(tyèu_içop" autocomplete="off" autocorrect="off" spellcheck="false">wsxdcvgbhnj,e'r(tyèu_içop</textarea>
-                            </label>
+                        <label for="keyMapInput">Clavier d'ordinateur</label>
+                        <div style="overflow-x: scroll;padding: 2px;">
+                            <input type="text" id="keyMapInput" class="nes-input is-dark"
+                                minlength="25" maxlength="25" size="25" required
+                                placeholder="wsxdcvgbhnj,e'r(tyèu_içop" value="wsxdcvgbhnj,e'r(tyèu_içop"/>
+                        </div>
                     </div>
                     <label for="midiSelect" style="color:#fff">Clavier MIDI</label>
                     <div class="nes-select is-dark">

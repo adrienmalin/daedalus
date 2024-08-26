@@ -39,14 +39,25 @@ h1 {
     text-align: center;
 }
 
-textarea {
+#keyMapInput {
+    background-image: url(img/keyboard.png);
+    background-repeat: repeat-x;
+    background-size: 240px 50px;
+    margin: auto;
+    color: white;
+    text-shadow: #444 2px 2px, #444 -2px -2px, #444 2px -2px, #444 -2px 2px;
+    text-transform: uppercase;
+    padding-left: 3px;
     padding-right: 0;
+    letter-spacing: 4px;
+    width: calc(25em + 108px);
+    height: 54px;
 }
 
 .sliders {
     display: flex;
     justify-content: center;
-    margin: 20px;
+    overflow-x: scroll;
 }
 
 .sliders label {
