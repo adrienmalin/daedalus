@@ -45,7 +45,7 @@ h1 {
     background-size: 240px 50px;
     margin: auto;
     color: white;
-    text-shadow: #444 2px 2px, #444 -2px -2px, #444 2px -2px, #444 -2px 2px;
+    text-shadow: #444 0 2px, #444 2px 0, #444 0 -2px, #444 -2px 0;
     text-transform: uppercase;
     padding-left: 3px;
     padding-right: 0;
