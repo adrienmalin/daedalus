@@ -147,10 +147,11 @@ class Cannon extends Sprite {
 
 
 class Note extends Sprite {
-    constructor(canvasCtx, note, duration, sx, sy, width, height, frames, shotAnimationPeriod) {
+    constructor(canvasCtx, note, duration, velocity, sx, sy, width, height, frames, shotAnimationPeriod) {
         super(canvasCtx, "note.png", 34 * (note - FIRST_NOTE) + 66, -40, width, height, frames, 1)
         this.note = note
         this.duration = duration
+        this.velocity = velocity
         this.sx = sx
         this.sy = sy
         this.shotAnimationPeriod = shotAnimationPeriod
@@ -159,18 +160,13 @@ class Note extends Sprite {
     }
 
     animate() {
-        if (this.shot) {
-            this.frame = Math.floor(this.time/this.shotAnimationPeriod) % this.frames
-        } else {
-            this.frame = Math.floor(this.time/10) % this.frames
-        }
+        this.frame = Math.floor(this.time/10) % this.frames
         this.time++
     }
 
     draw() {
-        if (this.shot && this.frame == 1) {
+        if (this.shot) {
             this.drawShot()
-            this.animate()
         } else {
             super.draw()
         }
@@ -181,51 +177,64 @@ class Note extends Sprite {
     }
 
     explose() {
-        playNoise(0.3, 0.4, 1400)
         return new Sprite(this.canvasCtx, "tiny-explosion.png", this.x, this.y, 16, 16, 7)
+    }
+
+    playNoise() {
+        playNoise(0.3, 0.4, 1400)
     }
 }
 
 
 class Sixteenth extends Note {
-    constructor(canvasCtx, note, duration) {
-        super(canvasCtx, note, duration, 21, 0, 21, 32, 2, 2)
+    constructor(canvasCtx, note, duration, velocity) {
+        super(canvasCtx, note, duration, velocity, 21, 0, 21, 32, 2, 2)
     }
 }
 
 
 class Eighth extends Note {
-    constructor(canvasCtx, note, duration) {
-        super(canvasCtx, note, duration, 42, 0, 21, 32, 2, 2)
+    constructor(canvasCtx, note, duration, velocity) {
+        super(canvasCtx, note, duration, velocity, 42, 0, 21, 32, 2, 2)
     }
 }
 
 
 class Quarter extends Note {
-    constructor(canvasCtx, note, duration) {
-        super(canvasCtx, note, duration, 36, 32, 28, 68, 2, 4)
+    constructor(canvasCtx, note, duration, velocity) {
+        super(canvasCtx, note, duration, velocity, 34, 33, 30, 66, 2, 4)
     }
 
     drawShot() {
-        canvasCtx.drawImage(this.sprite, 0, 40, 34, 37, this.dx+2, this.dy+16, 34, 37)
+        canvasCtx.drawImage(this.sprite, 0, 34, 35, 67, this.dx, this.dy, 35, 67)
     }
 
     explose() {
-        playNoise(0.5, 0.5, 1000)
         return new Sprite(this.canvasCtx, "little-explosion.png", this.x, this.y, 33, 33, 5)
+    }
+
+    playNoise() {
+        playNoise(0.5, 0.5, 1000)
     }
 }
 
 class Whole extends Note {
-    constructor(canvasCtx, note, duration) {
-        super(canvasCtx, note, duration, 0, 78, 36, 40, 1)
+    constructor(canvasCtx, note, duration, velocity) {
+        super(canvasCtx, note, duration, velocity, 36, 99, 36, 40, 1)
     }
 
     animate() {}
 
+    drawShot() {
+        canvasCtx.drawImage(this.sprite, 0, this.sy, this.sWidth, this.sHeight, this.dx, this.dy, this.dWidth, this.dHeight)
+    }
+
     explose() {
-        playNoise(0.8, 0.7, 400)
         return new Sprite(canvasCtx, "big-explosion.png", this.x, this.y, 48, 48, 8)
+    }
+
+    playNoise() {
+        playNoise(0.8, 0.7, 400)
     }
 }
 
@@ -447,14 +456,16 @@ function update() {
         let explosionSprite = noteSprite.explose()
         explosionSprites.push(explosionSprite)
         explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+        noteSprite.playNoise()
     })
     noteSprites = noteSprites.filter(note => note.y < FLOOR)
 
-    cannonSprites.forEach(cannonSprite => {
+    /*cannonSprites.forEach(cannonSprite => {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
         if (noteSprite) {
             noteSprite.shot = cannonSprite.shooting
             if (noteSprite.shot) {
+                
                 noteSprite.duration -= UPDATE_PERIOD
                 if (noteSprite.duration > 0) {
                     playNote(cannonSprite.note)
@@ -473,10 +484,23 @@ function update() {
             stopNote(cannonSprite.note)
             cannonSprite.impactY = 0
         }
+    })*/
+    cannonSprites.filter(cannonSprite => cannonSprite.shooting).forEach(cannonSprite => {
+        let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
+        if (noteSprite) {
+            playNote(noteSprite.note, noteSprite.velocity, noteSprite.duration)
+            noteSprite.shot = true
+            window.setTimeout(() => {
+                noteSprites.remove(noteSprite)
+                let explosionSprite = noteSprite.explose()
+                explosionSprites.push(explosionSprite)
+                explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+            }, noteSprite.duration * 1000)
+        }
     })
 }
 
-function playNote(note, velocity=0.7) {
+function playNote(note, velocity=0.7, duration=0) {
     if(oscillators[note]) return
 
     var oscillator = audioCtx.createOscillator()
@@ -492,17 +516,22 @@ function playNote(note, velocity=0.7) {
 
     depth.connect(oscillator.detune)
 
-    oscillators[note] = oscillator
+    if (duration) {
+        oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], audioCtx.currentTime + duration, 0.5)
+        oscillator.stop(audioCtx.currentTime + duration + 0.6)
+    } else {
+        oscillators[note] = oscillator
+    }
 }
 
-function stopNote(note) {
+function stopNote(note, delay=0) {
     if(!oscillators[note]) return
 
     velocity = oscillators[note].velocity.gain.value
-    oscillators[note].velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], audioCtx.currentTime + 0.1, 0.5)
-    oscillators[note].stop(audioCtx.currentTime + 0.6)
+    oscillators[note].velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], audioCtx.currentTime + delay + 0.1, 0.5)
+    oscillators[note].stop(audioCtx.currentTime + delay + 0.6)
     
-    delete(oscillators[note])    
+    delete(oscillators[note])
 }
 
 function playNoise(noiseDuration, startGain=0.5, bandHz=1000) {
