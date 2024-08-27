@@ -1,6 +1,6 @@
 const MAX_LEVEL = 3
 const DRAW_PERIOD = 0.04 // s
-const UPDATE_PERIOD = 0.01 // s
+const UPDATE_PERIOD = 0.04 // s
 const FLOOR = 400 // px
 const FIRST_NOTE = 48 // C2
 const LAST_NOTE = 73 // C4
@@ -420,7 +420,7 @@ async function nextLevel() {
     midiSong = await Midi.fromUrl(`midi/${level}.mid`)
     levelTitle.innerText = `Niveau ${level}`
     songNameTitle.innerText = midiSong.name
-    speed = 0.04 * FLOOR / midiSong.header.tempos[0].bpm
+    speed = UPDATE_PERIOD * FLOOR / midiSong.header.tempos[0].bpm
     noteSprites = []
     midiSong.tracks.forEach(track => {
         //console.log(track.name)
@@ -460,35 +460,11 @@ function update() {
     })
     noteSprites = noteSprites.filter(note => note.y < FLOOR)
 
-    /*cannonSprites.forEach(cannonSprite => {
-        let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
-        if (noteSprite) {
-            noteSprite.shot = cannonSprite.shooting
-            if (noteSprite.shot) {
-                
-                noteSprite.duration -= UPDATE_PERIOD
-                if (noteSprite.duration > 0) {
-                    playNote(cannonSprite.note)
-                    cannonSprite.impactY = noteSprite.y
-                } else {
-                    stopNote(cannonSprite.note)
-                    let explosionSprite = noteSprite.explose()
-                    explosionSprites.push(explosionSprite)
-                    explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
-                    noteSprites.remove(noteSprite)
-                }
-            } else {
-                stopNote(cannonSprite.note)
-            }
-        } else {
-            stopNote(cannonSprite.note)
-            cannonSprite.impactY = 0
-        }
-    })*/
     cannonSprites.filter(cannonSprite => cannonSprite.shooting).forEach(cannonSprite => {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
-        if (noteSprite) {
+        if (noteSprite && !noteSprite.shot) {
             playNote(noteSprite.note, noteSprite.velocity, noteSprite.duration)
+            cannonSprite.impactY = noteSprite.y
             noteSprite.shot = true
             window.setTimeout(() => {
                 noteSprites.remove(noteSprite)
