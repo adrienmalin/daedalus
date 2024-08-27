@@ -1,11 +1,15 @@
 const MAX_LEVEL = 3
 const DRAW_PERIOD = 0.04 // s
+const FLOOR = 390 // px
+const TIME_TO_SCREEN = 10 // s
 const UPDATE_PERIOD = 0.01 // s
-const FLOOR = 386 // px
+const STEP = FLOOR * UPDATE_PERIOD / TIME_TO_SCREEN // px
 const FIRST_NOTE = 48 // C2
 const LAST_NOTE = 73 // C4
+const NOTE_NAMES = [
+    "C",     "C♯",    "D",     "D♯",    "E",     "F",     "F♯",    "G",     "G♯",    "A",  "A♯",    "B"
+]
 const FREQUENCIES = [
-    // C     C♯ / D♭  D        D♯ / E♭  E        F        F♯ / G♭  G        G♯ / A♭  A     A♯ / B♭  B
     16.35,   17.32,   18.35,   19.45,   20.6,    21.83,   23.12,   24.5,    25.96,   27.5, 29.14,   30.87,
     32.7,    34.65,   36.71,   38.89,   41.2,    43.65,   46.25,   49,      51.91,   55,   58.27,   61.74,
     65.41,   69.3,    73.42,   77.78,   82.41,   87.31,   92.5,    98,      103.83,  110,  116.54,  123.47,
@@ -16,7 +20,6 @@ const FREQUENCIES = [
     2093,    2217.46, 2349.32, 2489.02, 2637.02, 2793.83, 2959.96, 3135.96, 3322.44, 3520, 3729.31, 3951.07,
     4186.01, 4434.92, 4698.64, 4978.03, 5274.04, 5587.65, 5919.91, 6271.93, 6644.88, 7040, 7458.62, 7902.13,
 ]
-const NOTE_NAMES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
 
 
 Array.prototype.remove = function(item) {
@@ -220,7 +223,7 @@ class Quarter extends Note {
 
 class Whole extends Note {
     constructor(canvasCtx, note, duration, velocity) {
-        super(canvasCtx, note, duration, velocity, 36, 99, 36, 40, 1)
+        super(canvasCtx, note, duration, velocity, 36, 100, 36, 40, 1)
     }
 
     animate() {}
@@ -297,6 +300,7 @@ function init() {
     Tone.Transport.scheduleRepeat(draw, DRAW_PERIOD)
     Tone.Transport.scheduleRepeat(update, UPDATE_PERIOD)
 
+    settingsDialog.onclose = newGame
     showSettings()
 }
 startDialog.onclose = init
@@ -394,19 +398,14 @@ function onMIDIMessage(event) {
     let [code, note, velocity] = event.data
 
     if (144 <= code && code <= 159 && cannonSprites[note]) {
-        //playNote(note, velocity / 128)
         cannonSprites[note].shooting = true
     } else if (128 <= code && code <= 143 && cannonSprites[note]) {
-        //stopNote(note)
         cannonSprites[note].shooting = false
     }
 }
 
-settingsDialog.onclose = newGame
-
 let level
 function newGame() {
-    settingsDialog.onclose = resume
     level = 0
     nextLevel()
 }
@@ -414,13 +413,12 @@ function newGame() {
 let midiSong
 let noteSprites = []
 let explosionSprites = []
-let speed
-async function nextLevel() {
+async function nextLevel(time=0) {
+    Tone.Transport.pause()
     level++
     midiSong = await Midi.fromUrl(`midi/${level}.mid`)
     levelTitle.innerText = `Niveau ${level}`
     songNameTitle.innerText = midiSong.name
-    speed = 4 * UPDATE_PERIOD * FLOOR / midiSong.header.tempos[0].bpm
     noteSprites = []
     midiSong.tracks.forEach(track => {
         //console.log(track.name)
@@ -431,10 +429,10 @@ async function nextLevel() {
             else if (durationInQuarter <= 0.5) noteSprite = new Eighth(canvasCtx, note.midi, note.duration)
             else if (durationInQuarter <= 1) noteSprite = new Quarter(canvasCtx, note.midi, note.duration)
             else noteSprite = new Whole(canvasCtx, note.midi, note.duration)
-            Tone.Transport.scheduleOnce(time => noteSprites.push(noteSprite), note.time)
+            Tone.Transport.scheduleOnce(time => noteSprites.push(noteSprite), time + note.time)
         })        
     })
-    Tone.Transport.scheduleOnce(time => nextLevel, midiSong.duration)
+    Tone.Transport.scheduleOnce(time => nextLevel(time), time + midiSong.duration + TIME_TO_SCREEN)
 
     levelDialog.showModal()
 }
@@ -443,13 +441,14 @@ levelDialog.onclose = resume
 
 let updateTaskId
 function resume() {
+    settingsDialog.onclose = resume
     playing = true
     Tone.Transport.start()
 }
 
 function update(time) {
     noteSprites.forEach(noteSprite => {
-        noteSprite.y += speed
+        noteSprite.y += STEP
     })
     noteSprites.filter(noteSprite => noteSprite.y >= FLOOR).forEach(noteSprite => {
         stopNote(noteSprite.note)
