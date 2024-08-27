@@ -1,7 +1,7 @@
 const MAX_LEVEL = 3
 const DRAW_PERIOD = 0.04 // s
 const UPDATE_PERIOD = 0.01 // s
-const FLOOR = 400 // px
+const FLOOR = 386 // px
 const FIRST_NOTE = 48 // C2
 const LAST_NOTE = 73 // C4
 const FREQUENCIES = [
@@ -180,8 +180,8 @@ class Note extends Sprite {
         return new Sprite(this.canvasCtx, "tiny-explosion.png", this.x, this.y, 16, 16, 7)
     }
 
-    playNoise() {
-        playNoise(0.3, 0.4, 1400)
+    playNoise(time) {
+        playNoise(0.4, 1400, 0.3, time)
     }
 }
 
@@ -213,8 +213,8 @@ class Quarter extends Note {
         return new Sprite(this.canvasCtx, "little-explosion.png", this.x, this.y, 33, 33, 5)
     }
 
-    playNoise() {
-        playNoise(0.5, 0.5, 1000)
+    playNoise(time) {
+        playNoise(0.5, 1000, 0.5, time)
     }
 }
 
@@ -233,8 +233,8 @@ class Whole extends Note {
         return new Sprite(canvasCtx, "big-explosion.png", this.x, this.y, 48, 48, 8)
     }
 
-    playNoise() {
-        playNoise(0.8, 0.7, 400)
+    playNoise(time) {
+        playNoise(0.7, 400, 0.8, time)
     }
 }
 
@@ -420,7 +420,7 @@ async function nextLevel() {
     midiSong = await Midi.fromUrl(`midi/${level}.mid`)
     levelTitle.innerText = `Niveau ${level}`
     songNameTitle.innerText = midiSong.name
-    speed = UPDATE_PERIOD * FLOOR / midiSong.header.tempos[0].bpm
+    speed = 4 * UPDATE_PERIOD * FLOOR / midiSong.header.tempos[0].bpm
     noteSprites = []
     midiSong.tracks.forEach(track => {
         //console.log(track.name)
@@ -456,7 +456,7 @@ function update(time) {
         let explosionSprite = noteSprite.explose()
         explosionSprites.push(explosionSprite)
         explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
-        noteSprite.playNoise()
+        noteSprite.playNoise(time)
     })
     noteSprites = noteSprites.filter(note => note.y < FLOOR)
 
@@ -464,7 +464,7 @@ function update(time) {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
         if (noteSprite) {
             if (!noteSprite.shot) {
-                playNote(noteSprite.note, noteSprite.velocity, time + noteSprite.duration)
+                playNote(noteSprite.note, noteSprite.velocity, noteSprite.duration, time)
                 cannonSprite.impactY = noteSprite.y
                 noteSprite.shot = true
                 window.setTimeout(() => {
@@ -480,7 +480,7 @@ function update(time) {
     })
 }
 
-function playNote(note, velocity=0.7, stopAt=0) {
+function playNote(note, velocity=0.7, duration=0, time=0) {
     if(oscillators[note]) return
 
     var oscillator = audioCtx.createOscillator()
@@ -489,33 +489,33 @@ function playNote(note, velocity=0.7, stopAt=0) {
 
     oscillator.velocity = audioCtx.createGain()
     oscillator.velocity.gain.value = 0
-    oscillator.velocity.gain.linearRampToValueAtTime(velocity, audioCtx.currentTime + 0.05)
+    oscillator.velocity.gain.linearRampToValueAtTime(velocity, time + 0.05)
     oscillator.connect(oscillator.velocity)
     oscillator.start()
     oscillator.velocity.connect(volume)
 
     depth.connect(oscillator.detune)
 
-    if (stopAt) {
-        oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], stopAt, 0.5)
-        oscillator.stop(stopAt + 0.5)
+    if (duration) {
+        oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], time + duration, 0.5)
+        oscillator.stop(time + duration + 0.5)
     } else {
         oscillators[note] = oscillator
     }
 }
 
-function stopNote(note, delay=0) {
+function stopNote(note, time=0) {
     if(!oscillators[note]) return
 
     velocity = oscillators[note].velocity.gain.value
-    oscillators[note].velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], audioCtx.currentTime + delay + 0.1, 0.5)
-    oscillators[note].stop(audioCtx.currentTime + delay + 0.6)
+    oscillators[note].velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], time, 0.5)
+    oscillators[note].stop(time + 0.5)
     
     delete(oscillators[note])
 }
 
-function playNoise(noiseDuration, startGain=0.5, bandHz=1000) {
-    const bufferSize = audioCtx.sampleRate * noiseDuration
+function playNoise(startGain=0.5, bandHz=1000, duration, time) {
+    const bufferSize = audioCtx.sampleRate * duration
     const noiseBuffer = new AudioBuffer({
         length: bufferSize,
         sampleRate: audioCtx.sampleRate,
@@ -532,10 +532,10 @@ function playNoise(noiseDuration, startGain=0.5, bandHz=1000) {
         frequency: bandHz,
     })
     const gain = new GainNode(audioCtx)
-    gain.gain.setValueCurveAtTime([startGain, startGain/5, 0], audioCtx.currentTime, noiseDuration)
+    gain.gain.setValueCurveAtTime([startGain, startGain/5, 0], time, duration)
     noise.connect(bandpass).connect(gain).connect(audioCtx.destination)
     noise.start()
-    noise.stop(audioCtx.currentTime + noiseDuration)
+    noise.stop(time + duration)
 }
 
 document.onkeydown = function(event) {
