@@ -206,7 +206,7 @@ class Quarter extends Note {
     }
 
     drawShot() {
-        canvasCtx.drawImage(this.sprite, 0, 34, 35, 67, this.dx, this.dy, 35, 67)
+        canvasCtx.drawImage(this.sprite, 0, 34, 35, 66, this.dx, this.dy, 35, 66)
     }
 
     explose() {
@@ -447,7 +447,7 @@ function resume() {
     Tone.Transport.start()
 }
 
-function update() {
+function update(time) {
     noteSprites.forEach(noteSprite => {
         noteSprite.y += speed
     })
@@ -463,7 +463,7 @@ function update() {
     cannonSprites.filter(cannonSprite => cannonSprite.shooting).forEach(cannonSprite => {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
         if (noteSprite && !noteSprite.shot) {
-            playNote(noteSprite.note, noteSprite.velocity, noteSprite.duration)
+            playNote(noteSprite.note, noteSprite.velocity, time + noteSprite.duration)
             cannonSprite.impactY = noteSprite.y
             noteSprite.shot = true
             window.setTimeout(() => {
@@ -476,7 +476,7 @@ function update() {
     })
 }
 
-function playNote(note, velocity=0.7, duration=0) {
+function playNote(note, velocity=0.7, stopAt=0) {
     if(oscillators[note]) return
 
     var oscillator = audioCtx.createOscillator()
@@ -492,9 +492,9 @@ function playNote(note, velocity=0.7, duration=0) {
 
     depth.connect(oscillator.detune)
 
-    if (duration) {
-        oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], audioCtx.currentTime + duration, 0.5)
-        oscillator.stop(audioCtx.currentTime + duration + 0.6)
+    if (stopAt) {
+        oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], stopAt, 0.5)
+        oscillator.stop(stopAt + 0.5)
     } else {
         oscillators[note] = oscillator
     }
