@@ -1,6 +1,6 @@
 const MAX_LEVEL = 3
 const DRAW_PERIOD = 0.04 // s
-const UPDATE_PERIOD = 0.04 // s
+const UPDATE_PERIOD = 0.01 // s
 const FLOOR = 400 // px
 const FIRST_NOTE = 48 // C2
 const LAST_NOTE = 73 // C4
@@ -148,7 +148,7 @@ class Cannon extends Sprite {
 
 class Note extends Sprite {
     constructor(canvasCtx, note, duration, velocity, sx, sy, width, height, frames, shotAnimationPeriod) {
-        super(canvasCtx, "note.png", 34 * (note - FIRST_NOTE) + 66, -40, width, height, frames, 1)
+        super(canvasCtx, "note.png", 34 * (note - FIRST_NOTE) + 66, 0, width, height, frames, 1)
         this.note = note
         this.duration = duration
         this.velocity = velocity
@@ -462,16 +462,20 @@ function update(time) {
 
     cannonSprites.filter(cannonSprite => cannonSprite.shooting).forEach(cannonSprite => {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
-        if (noteSprite && !noteSprite.shot) {
-            playNote(noteSprite.note, noteSprite.velocity, time + noteSprite.duration)
-            cannonSprite.impactY = noteSprite.y
-            noteSprite.shot = true
-            window.setTimeout(() => {
-                noteSprites.remove(noteSprite)
-                let explosionSprite = noteSprite.explose()
-                explosionSprites.push(explosionSprite)
-                explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
-            }, noteSprite.duration * 1000)
+        if (noteSprite) {
+            if (!noteSprite.shot) {
+                playNote(noteSprite.note, noteSprite.velocity, time + noteSprite.duration)
+                cannonSprite.impactY = noteSprite.y
+                noteSprite.shot = true
+                window.setTimeout(() => {
+                    noteSprites.remove(noteSprite)
+                    let explosionSprite = noteSprite.explose()
+                    explosionSprites.push(explosionSprite)
+                    explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+                }, noteSprite.duration * 1000)
+            }
+        } else {
+            cannonSprite.impactY = 0
         }
     })
 }
