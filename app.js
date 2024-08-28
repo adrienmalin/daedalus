@@ -347,6 +347,11 @@ function pause() {
 
 settingsButton.onclick = showSettings
 
+keyMapInput.onclick=()=>{
+    let cursorPosition = keyMapInput.selectionStart
+    keyMapInput.setSelectionRange(cursorPosition, cursorPosition + 1)
+}
+
 keyMapInput.onchange = function(event) {
     keyMap = keyMapInput.value
     if (midiKeyboard) {
