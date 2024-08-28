@@ -95,15 +95,15 @@ class Sprite {
 
     onanimationend () {}
 
-    draw() {
+    draw(deltaX=0, deltaY=0) {
         canvasCtx.drawImage(
             this.sprite,
             this.sx + this.frame * this.sWidth,
             this.sy,
             this.sWidth,
             this.sHeight,
-            this.dx,
-            this.dy,
+            this.dx + deltaX,
+            this.dy + deltaY,
             this.dWidth,
             this.dHeight
         )
@@ -127,7 +127,7 @@ class Cannon extends Sprite {
         this.pipeSprite = new Sprite(canvasCtx, "pipe.png", this.x-1, this.y+36, 16, 18)
     }
 
-    draw() {
+    draw(deltaX=0, deltaY=0) {
         if (this.shooting) {
             this.frame += this.df
             if (this.frame >= this.frames) this.df = -1
@@ -135,16 +135,20 @@ class Cannon extends Sprite {
         } else {
             if (this.frame > 0) this.frame--
         }
-        this.pipeSprite.draw()
+        this.pipeSprite.draw(deltaX, deltaY)
         this.canvasCtx.fillStyle = "#d3d6cf"
-        this.canvasCtx.fillText(this.key, this.pipeSprite.x+2, this.pipeSprite.y+10)
+        this.canvasCtx.fillText(this.key, this.pipeSprite.x+2, this.pipeSprite.y+9)
         this.canvasCtx.fillStyle = "#222327"
         this.canvasCtx.fillText(this.key, this.pipeSprite.x, this.pipeSprite.y+8)
-        super.draw()
+        super.draw(deltaX, deltaY)
         if (this.frame) {
             this.canvasCtx.drawImage(this.sprite, this.sWidth*(this.frame), 0, this.sWidth, 1, this.dx, this.impactY, 22, this.dy - this.impactY)
             if (this.impactY) this.canvasCtx.drawImage(this.sprite, this.sWidth*(this.frame), 2*this.sHeight, this.sWidth, this.impactHeight, this.dx, this.impactY, this.dWidth, 2*this.impactHeight)
         }
+    }
+
+    explose() {
+        return new Sprite(canvasCtx, "big-explosion.png", this.x, this.y, 48, 48, 8)
     }
 }
 
@@ -167,11 +171,11 @@ class Note extends Sprite {
         this.time++
     }
 
-    draw() {
+    draw(deltaX=0, deltaY=0) {
         if (this.shot) {
             this.drawShot()
         } else {
-            super.draw()
+            super.draw(deltaX, deltaY)
         }
     }
 
@@ -258,8 +262,11 @@ let consoleSprite =  new Sprite(canvasCtx, "console.png", canvas.width/2, 554, 4
 let syntheSprite = new Sprite(canvasCtx, "synthe.png", canvas.width/2, 546, 110, 80)
 let cannonSprites = []
 for (let note=FIRST_NOTE; note<LAST_NOTE; note++) cannonSprites[note] = new Cannon(canvasCtx, note)
+let batterySprite = new Sprite(canvasCtx, "battery.png", 890, 40, 44, 13, 13)
+batterySprite.frame = 12
 
 window.onload = function() {
+    draw()
     startDialog.showModal()
     //window.setInterval(draw, 60)
 }
@@ -271,6 +278,7 @@ let mod
 let depth
 let compressor
 let oscillators = {}
+let updateTaskId
 function init() {
     Tone.start()
 
@@ -298,21 +306,31 @@ function init() {
     onpartialinput()
 
     Tone.Transport.scheduleRepeat(draw, DRAW_PERIOD)
-    Tone.Transport.scheduleRepeat(update, UPDATE_PERIOD)
+    updateTaskId = Tone.Transport.scheduleRepeat(update, UPDATE_PERIOD)
 
     settingsDialog.onclose = newGame
     showSettings()
 }
 startDialog.onclose = init
 
+let animateConsole = 0
 function draw() {
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
 
-    consoleSprite.draw()
-    cannonSprites.forEach(cannonSprite => cannonSprite.draw())
+    if (animateConsole) {
+        animateConsole++
+        if (animateConsole > 5) {
+            animateConsole = 0
+        }
+    }
+    let deltaY = animateConsole? 4 : 0;
+
+    consoleSprite.draw(0, deltaY)
+    cannonSprites.forEach(cannonSprite => cannonSprite.draw(0, deltaY))
     noteSprites.forEach(noteSprite => noteSprite.draw())
-    syntheSprite.draw()
+    syntheSprite.draw(0, -deltaY)
     explosionSprites.forEach(explosionSprite => explosionSprite.draw())
+    batterySprite.draw()
 }
 
 function showSettings() {
@@ -413,33 +431,39 @@ function newGame() {
 let midiSong
 let noteSprites = []
 let explosionSprites = []
+let health
 async function nextLevel(time=0) {
     Tone.Transport.pause()
     level++
-    midiSong = await Midi.fromUrl(`midi/${level}.mid`)
-    levelTitle.innerText = `Niveau ${level}`
-    songNameTitle.innerText = midiSong.name
-    noteSprites = []
-    midiSong.tracks.forEach(track => {
-        //console.log(track.name)
-        track.notes.filter(note => FIRST_NOTE <= note.midi && note.midi <= LAST_NOTE).forEach(note => {
-            let noteSprite
-            let durationInQuarter = note.durationTicks / midiSong.header.ppq
-            if (durationInQuarter <= 0.25) noteSprite = new Sixteenth(canvasCtx, note.midi, note.duration)
-            else if (durationInQuarter <= 0.5) noteSprite = new Eighth(canvasCtx, note.midi, note.duration)
-            else if (durationInQuarter <= 1) noteSprite = new Quarter(canvasCtx, note.midi, note.duration)
-            else noteSprite = new Whole(canvasCtx, note.midi, note.duration)
-            Tone.Transport.scheduleOnce(time => noteSprites.push(noteSprite), time + note.time)
-        })        
-    })
-    Tone.Transport.scheduleOnce(time => nextLevel(time), time + midiSong.duration + TIME_TO_SCREEN)
-
-    levelDialog.showModal()
+    if (level <= MAX_LEVEL) {
+        health = 12
+        batterySprite.frame = health
+        midiSong = await Midi.fromUrl(`midi/${level}.mid`)
+        levelTitle.innerText = `Niveau ${level}`
+        songNameTitle.innerText = midiSong.name
+        noteSprites = []
+        midiSong.tracks.forEach(track => {
+            //console.log(track.name)
+            track.notes.filter(note => FIRST_NOTE <= note.midi && note.midi <= LAST_NOTE).forEach(note => {
+                let noteSprite
+                let durationInQuarter = note.durationTicks / midiSong.header.ppq
+                if (durationInQuarter <= 0.25) noteSprite = new Sixteenth(canvasCtx, note.midi, note.duration)
+                else if (durationInQuarter <= 0.5) noteSprite = new Eighth(canvasCtx, note.midi, note.duration)
+                else if (durationInQuarter <= 1) noteSprite = new Quarter(canvasCtx, note.midi, note.duration)
+                else noteSprite = new Whole(canvasCtx, note.midi, note.duration)
+                Tone.Transport.scheduleOnce(time => noteSprites.push(noteSprite), time + note.time)
+            })        
+        })
+        Tone.Transport.scheduleOnce(time => nextLevel(time), time + midiSong.duration + TIME_TO_SCREEN)
+    
+        levelDialog.showModal()
+    } else {
+        // win
+    }
 }
 
 levelDialog.onclose = resume
 
-let updateTaskId
 function resume() {
     settingsDialog.onclose = resume
     playing = true
@@ -447,17 +471,24 @@ function resume() {
 }
 
 function update(time) {
-    noteSprites.forEach(noteSprite => {
+    noteSprites.filter(noteSprite => !noteSprite.shot).forEach(noteSprite => {
         noteSprite.y += STEP
     })
     noteSprites.filter(noteSprite => noteSprite.y >= FLOOR).forEach(noteSprite => {
-        stopNote(noteSprite.note)
         let explosionSprite = noteSprite.explose()
         explosionSprites.push(explosionSprite)
         explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
         noteSprite.playNoise(time)
+        animateConsole = 1
+        health--
+        batterySprite.frame = health
     })
     noteSprites = noteSprites.filter(note => note.y < FLOOR)
+
+    if (health <= 0) {
+        gameOver(time)
+        return
+    }
 
     cannonSprites.filter(cannonSprite => cannonSprite.shooting).forEach(cannonSprite => {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
@@ -477,6 +508,34 @@ function update(time) {
             cannonSprite.impactY = 0
         }
     })
+}
+
+function gameOver(time) {
+    playing = false
+
+    cannonSprites.forEach(cannonSprite => {
+        let explosionSprite = cannonSprite.explose()
+        explosionSprites.push(explosionSprite)
+        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+    })
+
+    noteSprites.forEach(noteSprite => {
+        let explosionSprite = noteSprite.explose()
+        explosionSprites.push(explosionSprite)
+        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+    })
+    noteSprites = []
+    playNoise(0.7, 400, 2, time)
+
+    Tone.Transport.clear(updateTaskId)
+    Tone.Transport.scheduleOnce((time) => {
+        Tone.Transport.stop(time)
+        gameOverDialog.showModal()
+    }, time + 0.2)
+}
+
+gameOverDialog.onclose = () => {
+    document.location = ""
 }
 
 function playNote(note, velocity=0.7, duration=0, time=0) {
