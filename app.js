@@ -268,7 +268,6 @@ batterySprite.frame = 12
 window.onload = function() {
     draw()
     startDialog.showModal()
-    //window.setInterval(draw, 60)
 }
 
 let audioCtx
@@ -341,7 +340,6 @@ window.onblur = showSettings
 
 function pause() {
     Tone.Transport.pause()
-    //window.clearInterval(updateTaskId)
     playing = false
 }
 
@@ -349,7 +347,7 @@ settingsButton.onclick = showSettings
 
 keyMapInput.onclick=()=>{
     let cursorPosition = keyMapInput.selectionStart
-    keyMapInput.setSelectionRange(cursorPosition, cursorPosition + 1)
+    keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
 }
 
 keyMapInput.onchange = function(event) {
@@ -368,7 +366,7 @@ keyMapInput.onchange = function(event) {
 var midiIputs
 midiSelect.onfocus = function() {
     midiIputs = {}
-    midiSelect.innerHTML = `<option value="">Aucun</option>`
+    midiSelect.innerHTML = `<option value="">Aucun (utiliser les touches ci-dessous)</option>`
     navigator.requestMIDIAccess().then(
         midiAccess => {
             if (midiAccess.inputs.size) {
