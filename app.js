@@ -350,6 +350,24 @@ function pause() {
 
 settingsButton.onclick = showSettings
 
+keyMapInput.onclick =  keyMapInput.onkeyup = function(event) {
+    let cursorPosition = keyMapInput.selectionEnd
+    keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
+}
+
+keyMapInput.onchange = function(event) {
+    keyMap = keyMapInput.value
+    if (midiKeyboard) {
+        cannonSprites.forEach((cannonSprite, index) => {
+            cannonSprite.key = NOTE_NAMES[index % NOTE_NAMES.length]
+        })
+    } else {
+        cannonSprites.forEach((cannonSprite, index) => {
+            cannonSprite.key = keyMap[index - FIRST_NOTE].toUpperCase()
+        })
+    }
+}
+
 var midiIputs
 var midiKeyboard = window.localStorage.midiKeyboard || ""
 midiSelect.onfocus = function() {
@@ -385,21 +403,13 @@ midiSelect.oninput = () => {
     window.localStorage.midiKeyboard = midiKeyboard
 }
 
-keyMapInput.onclick=()=>{
-    let cursorPosition = keyMapInput.selectionStart
-    keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
-}
+function onMIDIMessage(event) {
+    let [code, note, velocity] = event.data
 
-keyMapInput.onchange = function(event) {
-    keyMap = keyMapInput.value
-    if (midiKeyboard) {
-        cannonSprites.forEach((cannonSprite, index) => {
-            cannonSprite.key = NOTE_NAMES[index % NOTE_NAMES.length]
-        })
-    } else {
-        cannonSprites.forEach((cannonSprite, index) => {
-            cannonSprite.key = keyMap[index - FIRST_NOTE].toUpperCase()
-        })
+    if (144 <= code && code <= 159 && cannonSprites[note]) {
+        cannonSprites[note].shooting = true
+    } else if (128 <= code && code <= 143 && cannonSprites[note]) {
+        cannonSprites[note].shooting = false
     }
 }
 
@@ -419,16 +429,6 @@ function onpartialinput() {
     )
     for (const note in oscillators) {
         oscillators[note].setPeriodicWave(wave)
-    }
-}
-
-function onMIDIMessage(event) {
-    let [code, note, velocity] = event.data
-
-    if (144 <= code && code <= 159 && cannonSprites[note]) {
-        cannonSprites[note].shooting = true
-    } else if (128 <= code && code <= 143 && cannonSprites[note]) {
-        cannonSprites[note].shooting = false
     }
 }
 

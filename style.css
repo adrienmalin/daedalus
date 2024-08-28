@@ -53,6 +53,11 @@ h1 {
     width: calc(25em + 108px);
     height: 54px;
     font-size: 16px;
+    caret-color: transparent;
+}
+
+#keyMapInput::selection {
+    color: #209cee;
 }
 
 #keyMapInput,
