@@ -307,6 +307,11 @@ function init() {
     Tone.Transport.scheduleRepeat(draw, DRAW_PERIOD)
     updateTaskId = Tone.Transport.scheduleRepeat(update, UPDATE_PERIOD)
 
+    if (window.localStorage.midiKeyboard) {
+        midiSelect.onfocus()
+        keyMapInput.onchange()
+    }
+
     settingsDialog.onclose = newGame
     showSettings()
 }
@@ -345,6 +350,41 @@ function pause() {
 
 settingsButton.onclick = showSettings
 
+var midiIputs
+var midiKeyboard = window.localStorage.midiKeyboard || ""
+midiSelect.onfocus = function() {
+    midiIputs = {}
+    midiSelect.innerHTML = `<option value="">Aucun (utiliser les touches ci-dessous)</option>`
+    navigator.requestMIDIAccess().then(
+        midiAccess => {
+            if (midiAccess.inputs.size) {
+                for ([,input,] of midiAccess.inputs) {
+                    midiIputs[input.id] = input
+                    var option = document.createElement("option")
+                    option.value = input.id
+                    option.innerText = input.name
+                    midiSelect.add(option)
+                    input.onmidimessage = null
+                }
+                if(midiIputs[midiKeyboard]) midiSelect.value = midiKeyboard
+            }
+        },
+        error => {
+            console.log(error)
+        }
+    )
+}
+
+midiSelect.oninput = () => {
+    for (const id in midiIputs) midiIputs[id].onmidimessage = null
+    midiKeyboard = midiSelect.value
+    if (midiKeyboard) {
+        midiIputs[midiKeyboard].onmidimessage = onMIDIMessage
+    }
+    keyMapInput.onchange()
+    window.localStorage.midiKeyboard = midiKeyboard
+}
+
 keyMapInput.onclick=()=>{
     let cursorPosition = keyMapInput.selectionStart
     keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
@@ -361,39 +401,6 @@ keyMapInput.onchange = function(event) {
             cannonSprite.key = keyMap[index - FIRST_NOTE].toUpperCase()
         })
     }
-}
-
-var midiIputs
-midiSelect.onfocus = function() {
-    midiIputs = {}
-    midiSelect.innerHTML = `<option value="">Aucun (utiliser les touches ci-dessous)</option>`
-    navigator.requestMIDIAccess().then(
-        midiAccess => {
-            if (midiAccess.inputs.size) {
-                for ([,input,] of midiAccess.inputs) {
-                    midiIputs[input.id] = input
-                    var option = document.createElement("option")
-                    option.value = input.id
-                    option.innerText = input.name
-                    midiSelect.add(option)
-                    input.onmidimessage = null
-                }
-            }
-        },
-        error => {
-            console.log(error)
-        }
-    )
-}
-
-var midiKeyboard = ""
-midiSelect.oninput = () => {
-    for (const id in midiIputs) midiIputs[id].onmidimessage = null
-    midiKeyboard = midiSelect.value
-    if (midiKeyboard) {
-        midiIputs[midiKeyboard].onmidimessage = onMIDIMessage
-    }
-    keyMapInput.onchange()
 }
 
 volRange.oninput = function(event) {
