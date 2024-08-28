@@ -352,7 +352,11 @@ settingsButton.onclick = showSettings
 
 keyMapInput.onclick =  keyMapInput.onkeyup = function(event) {
     let cursorPosition = keyMapInput.selectionEnd
-    keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
+    if (event.key == "ArrowRight") {
+        keyMapInput.setSelectionRange(cursorPosition, cursorPosition+1)
+    } else {
+        keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
+    }
 }
 
 keyMapInput.onchange = function(event) {
