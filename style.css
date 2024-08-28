@@ -4,7 +4,7 @@ html, body, pre, code, kbd, samp {
 
 body {
     background-color: #212529;
-    font-size: 12;
+    font-size: 12px;
     display: flex;
     align-content: center;
     height: 100vh;
@@ -145,7 +145,20 @@ svg {
     height: 32px;
 }
 
-.nes-balloon, .nes-balloon.is-dark, .nes-btn, .nes-container.is-rounded, .nes-container.is-rounded.is-dark, .nes-dialog.is-rounded, .nes-dialog.is-rounded.is-dark, .nes-progress, .nes-progress.is-rounded, .nes-table.is-bordered, .nes-table.is-dark.is-bordered, .nes-input, .nes-textarea, .nes-select select {
+.nes-container,
+.nes-balloon,
+.nes-balloon.is-dark,.nes-btn,
+.nes-container.is-rounded,
+.nes-container.is-rounded.is-dark,
+.nes-dialog.is-rounded,
+.nes-dialog.is-rounded.is-dark,
+.nes-progress,
+.nes-progress.is-rounded,
+.nes-table.is-bordered,
+.nes-table.is-dark.is-bordered,
+.nes-input,
+.nes-textarea,
+.nes-select select {
     border-style: solid;
     border-width: 2px;
     border-image-outset: 2;
