@@ -36,17 +36,17 @@
                 <h2 class="title is-centered">Options</h2>
                 <section class="nes-container with-title is-dark">
                     <h3 class="title">Clavier MIDI</h3>
-                    <div class="nes-field">
+                    <div class="nes-field" style="display: flex; flex-direction: column-reverse;">
                         <div style="overflow-x: scroll;padding: 2px;">
                             <input type="text" id="keyMapInput" class="nes-input is-dark"
                                 minlength="25" maxlength="25" size="25" required tabindex="2"
                                 placeholder="wsxdcvgbhnj,e'r(tyèu_içop" value="wsxdcvgbhnj,e'r(tyèu_içop"/>
                         </div>
-                    </div>
-                    <div class="nes-select is-dark">
-                        <select id="midiSelect" tabindex="3">
-                            <option value="">Aucun (utiliser les touches ci-dessus)</option>
-                        </select>
+                        <div class="nes-select is-dark">
+                            <select id="midiSelect" tabindex="3">
+                                <option value="">Aucun (utiliser les touches ci-dessous)</option>
+                            </select>
+                        </div>
                     </div>
                 </section>
                 <section class="nes-container with-title is-dark">
