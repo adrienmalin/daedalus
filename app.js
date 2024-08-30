@@ -438,13 +438,13 @@ let midiSong
 let noteSprites = []
 let explosionSprites = []
 let health
-async function nextLevel(time=0) {
+function nextLevel(time=0) {
     Tone.Transport.pause()
     level++
-    if (level <= MAX_LEVEL) {
+    midiSong = Midi.fromUrl(`midi/${level}.mid`).then((midi) => {
+        midiSong = midi
         health = 12
         batterySprite.frame = health
-        midiSong = await Midi.fromUrl(`midi/${level}.mid`)
         levelTitle.innerText = `Niveau ${level}`
         songNameTitle.innerText = midiSong.name
         noteSprites = []
@@ -463,9 +463,9 @@ async function nextLevel(time=0) {
         Tone.Transport.scheduleOnce(time => nextLevel(time), time + midiSong.duration + TIME_TO_SCREEN)
     
         levelDialog.showModal()
-    } else {
+    }).catch((error) => {
         victory(time)
-    }
+    })
 }
 
 levelDialog.onclose = resume
