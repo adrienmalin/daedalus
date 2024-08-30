@@ -27,6 +27,16 @@ body::before,
     pointer-events: none;
 }
 
+#canvas {
+    background-image: url(img/pixel-city-chill.gif);
+    background-size: cover;
+}
+
+#canvas.victory {
+    background-image: url(img/fireworks.gif);
+    background-size: contain;
+}
+
 .nes-dialog {
     max-width: 90%;
 }

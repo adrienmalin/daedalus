@@ -14,7 +14,7 @@
     </head>
     <body>
         <section class="nes-container is-dark" style="padding: 0;">
-            <canvas style="background-image: url(img/pixel-city-chill.gif); background-size: cover;" id="canvas" width="960" height="540" tabindex="9"></canvas>
+            <canvas id="canvas" width="960" height="540" tabindex="9"></canvas>
         </section>
         <dialog id="startDialog" class="nes-dialog is-rounded is-dark">
             <form method="dialog">
@@ -38,8 +38,9 @@
                     <h3 class="title">Clavier MIDI</h3>
                     <div class="nes-field" style="display: flex; flex-direction: column-reverse;">
                         <div style="overflow-x: scroll;padding: 2px;">
-                            <input type="text" id="keyMapInput" class="nes-input is-dark"
+                            <input type="text" id="keyMapInput" class="nes-textarea is-dark"
                                 minlength="25" maxlength="25" size="25" required tabindex="2"
+                                title="Cliquez pour changer une touche"
                                 placeholder="wsxdcvgbhnj,e'r(tyèu_içop" value="wsxdcvgbhnj,e'r(tyèu_içop"/>
                         </div>
                         <div class="nes-select is-dark">
@@ -77,6 +78,15 @@
                 <h3 id="songNameTitle" class="title is-centered">Titre</h3>
                 <div class="is-centered">
                     <button class="nes-btn is-primary" tabindex="1">Jouer</button>
+                </div>
+            </form>
+        </dialog>
+        <dialog id="victoryDialog" class="nes-dialog is-rounded is-dark">
+            <form method="dialog">
+                <h2 class="title is-centered">Victoire !</h2>
+                <p>Vous avez vaincu la musique.</p>
+                <div class="is-centered">
+                    <button class="nes-btn is-primary" tabindex="1">Rejouer ?</button>
                 </div>
             </form>
         </dialog>

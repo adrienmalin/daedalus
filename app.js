@@ -116,9 +116,9 @@ class Sprite {
 class Cannon extends Sprite {
     constructor(canvasCtx, note) {
         let sharp = [1, 3, 6, 8, 10].includes(note % 12)
-        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 422:426, 11, 26, 4)
+        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 418:424, 11, 26, 4)
         this.note = note
-        this.key = keyMap[note - FIRST_NOTE].toUpperCase()
+        this.key = keyMap[note - FIRST_NOTE]?.toUpperCase() || ""
         this.impactHeight = 9
         this.impactY = 0
         this.sy = sharp? 0 : this.sHeight
@@ -164,6 +164,7 @@ class Note extends Sprite {
         this.shotAnimationPeriod = shotAnimationPeriod
         this.shot = false
         this.time = 0
+        this.angriness = 1
     }
 
     animate() {
@@ -228,6 +229,7 @@ class Quarter extends Note {
 class Whole extends Note {
     constructor(canvasCtx, note, duration, velocity) {
         super(canvasCtx, note, duration, velocity, 36, 100, 36, 40, 1)
+        this.angriness = 2
     }
 
     animate() {}
@@ -352,7 +354,7 @@ settingsButton.onclick = showSettings
 
 keyMapInput.onclick =  keyMapInput.onkeyup = function(event) {
     let cursorPosition = keyMapInput.selectionEnd
-    if (event.key == "ArrowRight") {
+    if ((event.key == "ArrowRight" && cursorPosition <=  keyMapInput.value.length) || cursorPosition == 0) {
         keyMapInput.setSelectionRange(cursorPosition, cursorPosition+1)
     } else {
         keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
@@ -472,7 +474,7 @@ async function nextLevel(time=0) {
     
         levelDialog.showModal()
     } else {
-        // win
+        victory(time)
     }
 }
 
@@ -524,6 +526,11 @@ function update(time) {
     })
 }
 
+function victory(time) {
+    canvas.classList = "victory"
+    victoryDialog.showModal()
+}
+
 function gameOver(time) {
     playing = false
 
@@ -544,11 +551,11 @@ function gameOver(time) {
     Tone.Transport.clear(updateTaskId)
     Tone.Transport.scheduleOnce((time) => {
         Tone.Transport.stop(time)
-        gameOverDialog.showModal()
-    }, time + 0.2)
+    }, time + 0.1)
+    gameOverDialog.showModal()
 }
 
-gameOverDialog.onclose = () => {
+victoryDialog.onclose = gameOverDialog.onclose = function() {
     document.location = ""
 }
 
