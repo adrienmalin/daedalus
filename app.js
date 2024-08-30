@@ -409,16 +409,6 @@ midiSelect.oninput = () => {
     window.localStorage.midiKeyboard = midiKeyboard
 }
 
-function onMIDIMessage(event) {
-    let [code, note, velocity] = event.data
-
-    if (144 <= code && code <= 159 && cannonSprites[note]) {
-        cannonSprites[note].shooting = true
-    } else if (128 <= code && code <= 143 && cannonSprites[note]) {
-        cannonSprites[note].shooting = false
-    }
-}
-
 volRange.oninput = function(event) {
     volume.gain.linearRampToValueAtTime(volRange.value, audioCtx.currentTime)
 }
@@ -486,6 +476,39 @@ function resume() {
     Tone.Transport.start()
 }
 
+document.onkeydown = function(event) {
+    if (playing && keyMap.includes(event.key)) {
+        event.preventDefault()
+        let note = FIRST_NOTE + keyMap.indexOf(event.key)
+        shoot(note)
+    }
+}
+
+document.onkeyup = function(event) {
+    if (playing && keyMap.includes(event.key)) {
+        event.preventDefault()
+        let note = FIRST_NOTE + keyMap.indexOf(event.key)
+        stopShoot(note)
+    }
+}
+
+function onMIDIMessage(event) {
+    let [code, note, velocity] = event.data
+    if (144 <= code && code <= 159 && cannonSprites[note]) {
+        shoot(note)
+    } else if (128 <= code && code <= 143 && cannonSprites[note]) {
+        stopShoot(note)
+    }
+}
+
+function shoot(note) {
+    cannonSprites[note].shooting = true
+}
+
+function stopShoot(note) {
+    cannonSprites[note].shooting = false
+}
+
 function update(time) {
     noteSprites.filter(noteSprite => !noteSprite.shot).forEach(noteSprite => {
         noteSprite.y += STEP
@@ -508,10 +531,11 @@ function update(time) {
 
     cannonSprites.filter(cannonSprite => cannonSprite.shooting).forEach(cannonSprite => {
         let noteSprite = noteSprites.find(noteSprite => noteSprite.note == cannonSprite.note)
+        cannonSprite.impactY  = noteSprite?.y || 0
         if (noteSprite) {
+            cannonSprite.impactY = noteSprite.y
             if (!noteSprite.shot) {
                 playNote(noteSprite.note, noteSprite.velocity, noteSprite.duration, time)
-                cannonSprite.impactY = noteSprite.y
                 noteSprite.shot = true
                 window.setTimeout(() => {
                     noteSprites.remove(noteSprite)
@@ -524,39 +548,6 @@ function update(time) {
             cannonSprite.impactY = 0
         }
     })
-}
-
-function victory(time) {
-    canvas.classList = "victory"
-    victoryDialog.showModal()
-}
-
-function gameOver(time) {
-    playing = false
-
-    cannonSprites.forEach(cannonSprite => {
-        let explosionSprite = cannonSprite.explose()
-        explosionSprites.push(explosionSprite)
-        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
-    })
-
-    noteSprites.forEach(noteSprite => {
-        let explosionSprite = noteSprite.explose()
-        explosionSprites.push(explosionSprite)
-        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
-    })
-    noteSprites = []
-    playNoise(0.7, 400, 2, time)
-
-    Tone.Transport.clear(updateTaskId)
-    Tone.Transport.scheduleOnce((time) => {
-        Tone.Transport.stop(time)
-    }, time + 0.1)
-    gameOverDialog.showModal()
-}
-
-victoryDialog.onclose = gameOverDialog.onclose = function() {
-    document.location = ""
 }
 
 function playNote(note, velocity=0.7, duration=0, time=0) {
@@ -617,18 +608,35 @@ function playNoise(startGain=0.5, bandHz=1000, duration, time) {
     noise.stop(time + duration)
 }
 
-document.onkeydown = function(event) {
-    if (playing && keyMap.includes(event.key)) {
-        event.preventDefault()
-        let note = FIRST_NOTE + keyMap.indexOf(event.key)
-        cannonSprites[note].shooting = true
-    }
+function victory(time) {
+    canvas.classList = "victory"
+    victoryDialog.showModal()
 }
 
-document.onkeyup = function(event) {
-    if (playing && keyMap.includes(event.key)) {
-        event.preventDefault()
-        let note = FIRST_NOTE + keyMap.indexOf(event.key)
-        cannonSprites[note].shooting = false
-    }
+function gameOver(time) {
+    playing = false
+
+    cannonSprites.forEach(cannonSprite => {
+        let explosionSprite = cannonSprite.explose()
+        explosionSprites.push(explosionSprite)
+        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+    })
+
+    noteSprites.forEach(noteSprite => {
+        let explosionSprite = noteSprite.explose()
+        explosionSprites.push(explosionSprite)
+        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+    })
+    noteSprites = []
+    playNoise(0.7, 400, 2, time)
+
+    Tone.Transport.clear(updateTaskId)
+    Tone.Transport.scheduleOnce((time) => {
+        Tone.Transport.stop(time)
+    }, time + 0.1)
+    gameOverDialog.showModal()
+}
+
+victoryDialog.onclose = gameOverDialog.onclose = function() {
+    document.location = ""
 }
