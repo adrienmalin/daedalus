@@ -86,7 +86,7 @@ class Sprite {
             } else {
                 if (this.frame < this.frames -1) {
                     this.frame++
-                } else {
+                } else if (this.frame == this.frames -1) {
                     this.onanimationend()
                 }
             }
@@ -503,10 +503,36 @@ function onMIDIMessage(event) {
 
 function shoot(note) {
     cannonSprites[note].shooting = true
+
+    if (cannonSprites[note].oscillator) return
+
+    var oscillator = audioCtx.createOscillator({type: "sawtooth"})
+    oscillator.type = "sawtooth"
+    oscillator.frequency.value = FREQUENCIES[note - 12]
+
+    oscillator.velocity = audioCtx.createGain()
+    oscillator.velocity.gain.value = 0
+    oscillator.velocity.gain.linearRampToValueAtTime(0.15, Tone.Transport.seconds + 0.05)
+    oscillator.connect(oscillator.velocity)
+    oscillator.start()
+    oscillator.velocity.connect(volume)
+
+    depth.connect(oscillator.detune)
+    
+    cannonSprites[note].oscillator = oscillator
 }
 
 function stopShoot(note) {
     cannonSprites[note].shooting = false
+
+    if (!cannonSprites[note].oscillator) return
+
+    var oscillator = cannonSprites[note].oscillator
+    velocity = oscillator.velocity.gain.value
+    oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], Tone.Transport.seconds, 0.5)
+    oscillator.stop(Tone.Transport.seconds + 0.5)
+    
+    delete(cannonSprites[note].oscillator)
 }
 
 function update(time) {
@@ -619,16 +645,16 @@ function gameOver(time) {
     cannonSprites.forEach(cannonSprite => {
         let explosionSprite = cannonSprite.explose()
         explosionSprites.push(explosionSprite)
-        explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
+        explosionSprite.play().then(() => {console.log(cannonSprite.note); explosionSprites.remove(explosionSprite)})
     })
+    playNoise(0.7, 400, 2, time)
 
-    noteSprites.forEach(noteSprite => {
+    /*noteSprites.forEach(noteSprite => {
         let explosionSprite = noteSprite.explose()
         explosionSprites.push(explosionSprite)
         explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
     })
-    noteSprites = []
-    playNoise(0.7, 400, 2, time)
+    noteSprites = []*/
 
     Tone.Transport.clear(updateTaskId)
     Tone.Transport.scheduleOnce((time) => {
