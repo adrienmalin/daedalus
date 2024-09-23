@@ -508,7 +508,7 @@ function shoot(note) {
 
     var oscillator = audioCtx.createOscillator({type: "sawtooth"})
     oscillator.type = "sawtooth"
-    oscillator.frequency.value = FREQUENCIES[note - 12]
+    oscillator.frequency.value = FREQUENCIES[note - 24]
 
     oscillator.velocity = audioCtx.createGain()
     oscillator.velocity.gain.value = 0
@@ -529,7 +529,7 @@ function stopShoot(note) {
 
     var oscillator = cannonSprites[note].oscillator
     velocity = oscillator.velocity.gain.value
-    oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], Tone.Transport.seconds, 0.5)
+    oscillator.velocity.gain.exponentialRampToValueAtTime(1, Tone.Transport.seconds, 0.5)
     oscillator.stop(Tone.Transport.seconds + 0.5)
     
     delete(cannonSprites[note].oscillator)
@@ -576,7 +576,7 @@ function update(time) {
     })
 }
 
-function playNote(note, velocity=0.7, duration=0, time=0) {
+function playNote(note, velocity=0.7, duration=0, time=audioCtx.currentTime) {
     if(oscillators[note]) return
 
     var oscillator = audioCtx.createOscillator()
@@ -593,18 +593,18 @@ function playNote(note, velocity=0.7, duration=0, time=0) {
     depth.connect(oscillator.detune)
 
     if (duration) {
-        oscillator.velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], time + duration, 0.5)
+        oscillator.velocity.gain.exponentialRampToValueAtTime(1, time + duration, 0.5)
         oscillator.stop(time + duration + 0.5)
     } else {
         oscillators[note] = oscillator
     }
 }
 
-function stopNote(note, time=0) {
+function stopNote(note, time=audioCtx.currentTime) {
     if(!oscillators[note]) return
 
     velocity = oscillators[note].velocity.gain.value
-    oscillators[note].velocity.gain.setValueCurveAtTime([velocity, velocity/10, velocity/20, 0], time, 0.5)
+    oscillators[note].velocity.gain.exponentialRampToValueAtTime(1, time, 0.5)
     oscillators[note].stop(time + 0.5)
     
     delete(oscillators[note])
@@ -628,7 +628,7 @@ function playNoise(startGain=0.5, bandHz=1000, duration, time) {
         frequency: bandHz,
     })
     const gain = new GainNode(audioCtx)
-    gain.gain.setValueCurveAtTime([startGain, startGain/5, 0], time, duration)
+    gain.gain.exponentialRampToValueAtTime(0.5, time, duration)
     noise.connect(bandpass).connect(gain).connect(audioCtx.destination)
     noise.start()
     noise.stop(time + duration)
