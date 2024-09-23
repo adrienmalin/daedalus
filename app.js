@@ -576,7 +576,7 @@ function update(time) {
     })
 }
 
-function playNote(note, velocity=0.7, duration=0, time=audioCtx.currentTime) {
+function playNote(note, velocity=0.7, duration=0, time=Tone.Transport.seconds) {
     if(oscillators[note]) return
 
     var oscillator = audioCtx.createOscillator()
@@ -600,7 +600,7 @@ function playNote(note, velocity=0.7, duration=0, time=audioCtx.currentTime) {
     }
 }
 
-function stopNote(note, time=audioCtx.currentTime) {
+function stopNote(note, time=Tone.Transport.seconds) {
     if(!oscillators[note]) return
 
     velocity = oscillators[note].velocity.gain.value
