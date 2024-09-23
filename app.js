@@ -439,7 +439,7 @@ let noteSprites = []
 let explosionSprites = []
 let health
 function nextLevel(time=0) {
-    Tone.Transport.pause()
+    Tone.Transport.pause(time)
     level++
     midiSong = Midi.fromUrl(`midi/${level}.mid`).then((midi) => {
         midiSong = midi
@@ -460,7 +460,7 @@ function nextLevel(time=0) {
                 Tone.Transport.scheduleOnce(time => noteSprites.push(noteSprite), time + note.time)
             })        
         })
-        Tone.Transport.scheduleOnce(time => nextLevel(time), time + midiSong.duration + TIME_TO_SCREEN)
+        Tone.Transport.scheduleOnce(nextLevel, time + midiSong.duration + TIME_TO_SCREEN)
     
         levelDialog.showModal()
     }).catch((error) => {
