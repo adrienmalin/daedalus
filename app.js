@@ -116,7 +116,8 @@ class Sprite {
 class Cannon extends Sprite {
     constructor(canvasCtx, note) {
         let sharp = [1, 3, 6, 8, 10].includes(note % 12)
-        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 418:424, 11, 26, 4)
+        //super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 418:424, 11, 26, 4)
+        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, 424 - 8*(note % 3), 11, 26, 4)
         this.note = note
         this.key = keyMap[note - FIRST_NOTE]?.toUpperCase() || ""
         this.impactHeight = 9
@@ -260,7 +261,7 @@ canvasCtx.imageSmoothingEnabled = false
 canvasCtx.font = '12px "Press Start 2P"'
 canvasCtx.textAlign = "center"
 
-let consoleSprite =  new Sprite(canvasCtx, "console.png", canvas.width/2, 554, 482, 86)
+let consoleSprite =  new Sprite(canvasCtx, "console.png", canvas.width/2, 554, 482, 104)
 let syntheSprite = new Sprite(canvasCtx, "synthe.png", canvas.width/2, 546, 110, 80)
 let cannonSprites = []
 for (let note=FIRST_NOTE; note<LAST_NOTE; note++) cannonSprites[note] = new Cannon(canvasCtx, note)
@@ -528,7 +529,7 @@ function stopShoot(note) {
     if (!cannonSprites[note].oscillator) return
 
     var oscillator = cannonSprites[note].oscillator
-    oscillator.velocity.gain.exponentialRampToValueAtTime(0, Tone.Transport.seconds, 0.5)
+    oscillator.velocity.gain.exponentialRampToValueAtTime(0.01, Tone.Transport.seconds, 0.5)
     oscillator.stop(Tone.Transport.seconds + 0.5)
     
     delete(cannonSprites[note].oscillator)
@@ -598,7 +599,7 @@ function playNote(note, velocity=0.7, duration=0, time=audioCtx.currentTime) {
 function stopNote(note, time=audioCtx.currentTime) {
     if(!oscillators[note]) return
 
-    oscillators[note].velocity.gain.exponentialRampToValueAtTime(0, time + 0.5)
+    oscillators[note].velocity.gain.exponentialRampToValueAtTime(0.01, time + 0.5)
     oscillators[note].stop(time + 0.5)
     
     delete(oscillators[note])
@@ -622,7 +623,8 @@ function playNoise(startGain=0.5, bandHz=1000, duration, time) {
         frequency: bandHz,
     })
     const gain = new GainNode(audioCtx)
-    gain.gain.exponentialRampToValueAtTime(0, time, duration)
+    gain.gain.value = startGain
+    gain.gain.exponentialRampToValueAtTime(0.01, time, duration)
     noise.connect(bandpass).connect(gain).connect(audioCtx.destination)
     noise.start()
     noise.stop(time + duration)
