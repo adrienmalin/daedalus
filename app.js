@@ -639,16 +639,9 @@ function gameOver(time) {
     cannonSprites.forEach(cannonSprite => {
         let explosionSprite = cannonSprite.explose()
         explosionSprites.push(explosionSprite)
-        explosionSprite.play().then(() => {console.log(cannonSprite.note); explosionSprites.remove(explosionSprite)})
-    })
-    playNoise(0.7, 400, 2, time)
-
-    /*noteSprites.forEach(noteSprite => {
-        let explosionSprite = noteSprite.explose()
-        explosionSprites.push(explosionSprite)
         explosionSprite.play().then(() => explosionSprites.remove(explosionSprite))
     })
-    noteSprites = []*/
+    playNoise(0.7, 400, 2, time)
 
     Tone.Transport.clear(updateTaskId)
     Tone.Transport.scheduleOnce((time) => {
