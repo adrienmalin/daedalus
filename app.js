@@ -528,8 +528,7 @@ function stopShoot(note) {
     if (!cannonSprites[note].oscillator) return
 
     var oscillator = cannonSprites[note].oscillator
-    velocity = oscillator.velocity.gain.value
-    oscillator.velocity.gain.exponentialRampToValueAtTime(1, Tone.Transport.seconds, 0.5)
+    oscillator.velocity.gain.exponentialRampToValueAtTime(0, Tone.Transport.seconds, 0.5)
     oscillator.stop(Tone.Transport.seconds + 0.5)
     
     delete(cannonSprites[note].oscillator)
@@ -576,7 +575,7 @@ function update(time) {
     })
 }
 
-function playNote(note, velocity=0.7, duration=0, time=Tone.Transport.seconds) {
+function playNote(note, velocity=0.7, duration=0, time=audioCtx.currentTime) {
     if(oscillators[note]) return
 
     var oscillator = audioCtx.createOscillator()
@@ -592,19 +591,14 @@ function playNote(note, velocity=0.7, duration=0, time=Tone.Transport.seconds) {
 
     depth.connect(oscillator.detune)
 
-    if (duration) {
-        oscillator.velocity.gain.exponentialRampToValueAtTime(1, time + duration, 0.5)
-        oscillator.stop(time + duration + 0.5)
-    } else {
-        oscillators[note] = oscillator
-    }
+    oscillators[note] = oscillator
+    if (duration) stopNote(note, time + duration)
 }
 
-function stopNote(note, time=Tone.Transport.seconds) {
+function stopNote(note, time=audioCtx.currentTime) {
     if(!oscillators[note]) return
 
-    velocity = oscillators[note].velocity.gain.value
-    oscillators[note].velocity.gain.exponentialRampToValueAtTime(1, time, 0.5)
+    oscillators[note].velocity.gain.exponentialRampToValueAtTime(0, time + 0.5)
     oscillators[note].stop(time + 0.5)
     
     delete(oscillators[note])
@@ -628,7 +622,7 @@ function playNoise(startGain=0.5, bandHz=1000, duration, time) {
         frequency: bandHz,
     })
     const gain = new GainNode(audioCtx)
-    gain.gain.exponentialRampToValueAtTime(0.5, time, duration)
+    gain.gain.exponentialRampToValueAtTime(0, time, duration)
     noise.connect(bandpass).connect(gain).connect(audioCtx.destination)
     noise.start()
     noise.stop(time + duration)
