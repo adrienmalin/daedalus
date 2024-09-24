@@ -316,7 +316,7 @@ function init() {
     }
 
     settingsDialog.onclose = newGame
-    showSettings()
+    pause()
 }
 startDialog.onclose = init
 
@@ -340,22 +340,19 @@ function draw() {
     batterySprite.draw()
 }
 
-function showSettings() {
-    pause()
-    settingsDialog.showModal()
-}
-window.onblur = showSettings
+window.onblur = pause
 
 function pause() {
     Tone.Transport.pause()
     playing = false
+    settingsDialog.showModal()
 }
 
-settingsButton.onclick = showSettings
+settingsButton.onclick = pause
 
 keyMapInput.onclick =  keyMapInput.onkeyup = function(event) {
     let cursorPosition = keyMapInput.selectionEnd
-    if ((event.key == "ArrowRight" && cursorPosition <=  keyMapInput.value.length) || cursorPosition == 0) {
+    if (cursorPosition == 0 || (event.key == "ArrowRight" && cursorPosition <=  keyMapInput.value.length)) {
         keyMapInput.setSelectionRange(cursorPosition, cursorPosition+1)
     } else {
         keyMapInput.setSelectionRange(cursorPosition-1, cursorPosition)
@@ -439,7 +436,7 @@ let midiSong
 let noteSprites = []
 let explosionSprites = []
 let health
-function nextLevel(time=0) {
+function nextLevel(time=Tone.Transport.seconds) {
     Tone.Transport.pause(time)
     level++
     midiSong = Midi.fromUrl(`midi/${level}.mid`).then((midi) => {
@@ -478,17 +475,24 @@ function resume() {
 }
 
 document.onkeydown = function(event) {
-    if (playing && keyMap.includes(event.key)) {
-        event.preventDefault()
-        let note = FIRST_NOTE + keyMap.indexOf(event.key)
+    if (event.altKey || event.ctrlKey) return
+
+    let keyIndex = keyMap.indexOf(event.key.toLowerCase())
+    if (keyIndex >= 0) {
+        if (event.target != keyMapInput) event.preventDefault()
+        let note = FIRST_NOTE + keyIndex
         shoot(note)
     }
 }
 
 document.onkeyup = function(event) {
-    if (playing && keyMap.includes(event.key)) {
-        event.preventDefault()
-        let note = FIRST_NOTE + keyMap.indexOf(event.key)
+    if (event.altKey || event.ctrlKey) return
+    if (event.key =="Escape") pause()
+
+    let keyIndex = keyMap.indexOf(event.key.toLowerCase())
+    if (keyIndex >= 0) {
+        if (event.target != keyMapInput) event.preventDefault()
+        let note = FIRST_NOTE + keyIndex
         stopShoot(note)
     }
 }
