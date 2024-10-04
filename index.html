@@ -36,17 +36,17 @@
                 <h2 class="title is-centered">Options</h2>
                 <section class="nes-container with-title is-dark">
                     <h3 class="title">Clavier MIDI</h3>
+                    <div class="nes-select is-dark">
+                        <select id="midiSelect" tabindex="3">
+                            <option value="">Aucun (utiliser les touches ci-dessous)</option>
+                        </select>
+                    </div>
                     <div class="nes-field" style="display: flex; flex-direction: column-reverse;">
                         <div style="overflow-x: scroll;padding: 2px;">
                             <input type="text" id="keyMapInput" class="nes-textarea is-dark"
                                 minlength="25" maxlength="25" size="25" required tabindex="2"
                                 title="Cliquez pour changer une touche"
                                 placeholder="ccddeffggaabccddeffggaabc" value="wsexdrcftvgybhunji,ko;lp:"/>
-                        </div>
-                        <div class="nes-select is-dark">
-                            <select id="midiSelect" tabindex="3">
-                                <option value="">Aucun (utiliser les touches ci-dessous)</option>
-                            </select>
                         </div>
                     </div>
                 </section>
@@ -68,7 +68,7 @@
                     </div>
                 </section>
                 <menu class="is-centered">
-                    <button id="playButton" class="nes-btn is-primary" tabindex="1">OK</button>
+                    <button id="playButton" class="nes-btn is-primary" autofocus>OK</button>
                 </menu>
             </form>
         </dialog>
@@ -77,7 +77,7 @@
                 <h2 id="levelTitle" class="title is-centered">Niveau X</h2>
                 <h3 id="songNameTitle" class="title is-centered">Titre</h3>
                 <div class="is-centered">
-                    <button class="nes-btn is-primary" tabindex="1">Jouer</button>
+                    <button class="nes-btn is-primary" autofocus>Jouer</button>
                 </div>
             </form>
         </dialog>
@@ -86,7 +86,7 @@
                 <h2 class="title is-centered">Victoire !</h2>
                 <p>Vous avez vaincu la musique.</p>
                 <div class="is-centered">
-                    <button class="nes-btn is-primary" tabindex="1">Rejouer ?</button>
+                    <button class="nes-btn is-primary" autofocus>Rejouer ?</button>
                 </div>
             </form>
         </dialog>
@@ -94,7 +94,7 @@
             <form method="dialog">
                 <h2 class="title is-centered">Game over</h2>
                 <div class="is-centered">
-                    <button class="nes-btn is-primary" tabindex="1">Rejouer ?</button>
+                    <button class="nes-btn is-primary" autofocus>Rejouer ?</button>
                 </div>
             </form>
         </dialog>

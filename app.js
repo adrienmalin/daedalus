@@ -480,8 +480,7 @@ document.onkeydown = function(event) {
     let keyIndex = keyMap.indexOf(event.key.toLowerCase())
     if (keyIndex >= 0) {
         if (event.target != keyMapInput) event.preventDefault()
-        let note = FIRST_NOTE + keyIndex
-        shoot(note)
+        shoot(FIRST_NOTE + keyIndex)
     }
 }
 
@@ -492,8 +491,7 @@ document.onkeyup = function(event) {
     let keyIndex = keyMap.indexOf(event.key.toLowerCase())
     if (keyIndex >= 0) {
         if (event.target != keyMapInput) event.preventDefault()
-        let note = FIRST_NOTE + keyIndex
-        stopShoot(note)
+        stopShoot(FIRST_NOTE + keyIndex)
     }
 }
 
