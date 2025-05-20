@@ -37,7 +37,7 @@ body {
   margin-right: auto;
   margin-top: 20vh;
   margin-bottom: 5vh;
-  animation: perspective 60s infinite;
+  animation: perspective 30s;
 }
 
 @keyframes rotation {
