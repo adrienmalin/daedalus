@@ -117,7 +117,7 @@ class Cannon extends Sprite {
     constructor(canvasCtx, note) {
         let sharp = [1, 3, 6, 8, 10].includes(note % 12)
         //super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 418:424, 11, 26, 4)
-        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, 424 - 8*(note % 3), 11, 26, 4)
+        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, 454 - 20*(note % 3), 11, 26, 4)
         this.note = note
         this.key = keyMap[note - FIRST_NOTE]?.toUpperCase() || ""
         this.impactHeight = 9
@@ -139,7 +139,7 @@ class Cannon extends Sprite {
         this.pipeSprite.draw(deltaX, deltaY)
         this.canvasCtx.fillStyle = "#d3d6cf"
         this.canvasCtx.fillText(this.key, this.pipeSprite.x+2, this.pipeSprite.y+9)
-        this.canvasCtx.fillStyle = "#222327"
+        this.canvasCtx.fillStyle = "#0d0a0a"
         this.canvasCtx.fillText(this.key, this.pipeSprite.x, this.pipeSprite.y+8)
         super.draw(deltaX, deltaY)
         if (this.frame) {
@@ -258,11 +258,11 @@ canvasCtx.webkitImageSmoothingEnabled = false
 canvasCtx.msImageSmoothingEnabled = false
 canvasCtx.imageSmoothingEnabled = false
 
-canvasCtx.font = '12px "Press Start 2P"'
+canvasCtx.font = 'bold 12px "Press Start 2P"'
 canvasCtx.textAlign = "center"
 
 let consoleSprite =  new Sprite(canvasCtx, "console.png", canvas.width/2, 554, 482, 104)
-let syntheSprite = new Sprite(canvasCtx, "synthe.png", canvas.width/2, 546, 110, 80)
+let syntheSprite = new Sprite(canvasCtx, "synthe.png", canvas.width/2, 546, 110, 46)
 let cannonSprites = []
 for (let note=FIRST_NOTE; note<LAST_NOTE; note++) cannonSprites[note] = new Cannon(canvasCtx, note)
 let batterySprite = new Sprite(canvasCtx, "battery.png", 890, 40, 44, 13, 13)
