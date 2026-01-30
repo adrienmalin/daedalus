@@ -10,18 +10,35 @@ import Stats from 'three/addons/libs/stats.module.js'
 
 import MazeMesh from './MazeMesh.js'
 
-//import 'three-hex-tiling'
+
+const playerHeight = 0.5
+const mazeWidth = 23
+
+const parameters = {
+    elevation: 48,
+    azimuth  : 53,
+}
+
+const waves = {
+    A: { direction:  0, steepness: 0.06, wavelength: 4 },
+    B: { direction: 30, steepness: 0.10, wavelength: 6 },
+    C: { direction: 60, steepness: 0.05, wavelength: 1.5 },
+}
+
+const loadingMaze = {
+    width: 23,
+    height: 23
+}
+
+const container = document.getElementById('container')
 
 
 // LOADING
 
-const loadingMazeWidth = 23
-const loadingMazeHeight = 23
-
-for(let y=0; y < loadingMazeHeight; y++) {
+for(let y=0; y < loadingMaze.height; y++) {
     let tr = document.createElement("tr")
     loadingMazeTable.appendChild(tr)
-    for(let x=0; x < loadingMazeWidth; x++) {
+    for(let x=0; x < loadingMaze.width; x++) {
         let td = document.createElement("td")
         tr.appendChild(td)
     }
@@ -42,7 +59,7 @@ function* build(x, y) {
         let y1 = y + dy
         let x2 = x1 + dx
         let y2 = y1 + dy
-        if (0 <= x2 && x2 < loadingMazeWidth && 0 <= y2 && y2 < loadingMazeHeight && walls[y2][x2]) {
+        if (0 <= x2 && x2 < loadingMaze.width && 0 <= y2 && y2 < loadingMaze.height && walls[y2][x2]) {
             dig(x1, y1)
             yield x1, y1
             dig(x2, y2)
@@ -60,10 +77,10 @@ function* endlessLoadingMaze() {
             }
         }
 
-        walls = Array(loadingMazeHeight).fill(true).map(row => Array(loadingMazeWidth).fill(true))
+        walls = Array(loadingMaze.height).fill(true).map(row => Array(loadingMaze.width).fill(true))
         
-        let x0 = Math.floor(loadingMazeWidth / 2)
-        let y0 = Math.floor(loadingMazeHeight / 2)
+        let x0 = Math.floor(loadingMaze.width / 2)
+        let y0 = Math.floor(loadingMaze.height / 2)
 
         dig(x0, y0)
         yield* build(x0, y0)
@@ -90,6 +107,7 @@ loadMngr.onError = function (url) {
 }
 loadMngr.onLoad = function (url, itemsLoaded, itemsTotal) {
     loading.style.display = "none"
+    container.style.display = "block"
     window.clearInterval(interval)
 
     renderer.setAnimationLoop(animate)
@@ -104,26 +122,10 @@ loadMngr.onLoad = function (url, itemsLoaded, itemsTotal) {
 
 // GAME
 
-const playerHeight = 0.5
-const mazeWidth = 23
-
-const parameters = {
-    elevation: 48,
-    azimuth  : 53,
-}
-
-const waves = {
-    A: { direction:  0, steepness: 0.06, wavelength: 4 },
-    B: { direction: 30, steepness: 0.10, wavelength: 6 },
-    C: { direction: 60, steepness: 0.05, wavelength: 1.5 },
-}
-
 const ambiance = new Audio("snd/ambiance.mp3")
 ambiance.loop = true
 const piano = new Audio("snd/waves-and-tears.mp3")
 piano.loop = false
-
-const container = document.getElementById('container')
 
 const renderer = new THREE.WebGLRenderer({
     powerPreference: "high-performance",
@@ -181,7 +183,6 @@ const sideGroundMaterial = new THREE.MeshStandardMaterial({
 	roughnessMap     : wallMaterial.roughnessMap.clone(),
 	roughness        : wallMaterial.roughness,
     metalness        : wallMaterial.metalness,
-    envMap           : scene.environment,
 })
 loader.load('Poly-cobblestone-wall/ao_map.jpg', (texture) => {
     wallMaterial.aoMap = texture
@@ -388,7 +389,7 @@ const raftMaterial = new THREE.MeshStandardMaterial({
     depthTest: true,
     depthWrite: true,
     displacementMap: loader.load("Poly-wood/displacement_map.webp", repeatRaftMaterial),
-    displacementScale: -0.3,
+    displacementScale: -0.32,
     displacementBias: 0.15,
 })
 const raft = new THREE.Mesh(raftGeometry, raftMaterial)

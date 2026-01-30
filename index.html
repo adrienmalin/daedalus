@@ -158,19 +158,17 @@
 			<div id="loadingMessage">Construction du labyrinthe : <span id="progress">0</span>%</div>
 			<div>
 				Se déplacer : <table class="keysTable">
-					<tr><td></td><td>↑</td><td></td></tr>
-					<tr><td>←</td><td></td><td>→</td></tr>
-					<tr><td></td><td>↓</td><td></td></tr>
+					<tr><td rowspan="2">←</td><td>↑</td><td rowspan="2">→</td></tr>
+					<tr><td>↓</td></tr>
 				</table>, <table class="keysTable">
-					<tr><td></td><td>Z</td><td></td></tr>
-					<tr><td>Q</td><td></td><td>D</td></tr>
-					<tr><td></td><td>S</td><td></td></tr>
+					<tr><td rowspan="2">Q</td><td>Z</td><td rowspan="2">D</td></tr>
+					<tr><td>S</td></tr>
 				</table> ou clic<br/>
-				Sauter : ESPACE<br/>
+				Sauter : Espace<br/>
 				Regarder : Souris
 			</div>
 		</div>
-		<div id="container"></div>
+		<div id="container" style="display: none"></div>
 		<span id="message"></span>
 
 		<script type="module" src="./main.js"></script>
