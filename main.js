@@ -5,6 +5,7 @@ import { Water } from 'three/addons/objects/Water.js'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js'
+import { CSM } from 'three/addons/csm/CSM.js';
 import Stats from 'three/addons/libs/stats.module.js'
 
 import MazeMesh from './MazeMesh.js'
@@ -130,8 +131,11 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.toneMapping = THREE.ACESFilmicToneMapping
+renderer.toneMappingExposure = 1.0
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
+renderer.physicallyCorrectLights = true
+renderer.outputColorSpace = THREE.SRGBColorSpace
 
 container.appendChild(renderer.domElement)
 
@@ -164,15 +168,51 @@ const mazeCollisionner = new THREE.Group()
 const wallMaterial = new THREE.MeshStandardMaterial({
     map            : loader.load('Poly-cobblestone-wall/color_map.webp'),
     normalMap      : loader.load('Poly-cobblestone-wall/normal_map_opengl.webp'),
-	aoMap          : loader.load('Poly-cobblestone-wall/ao_map.webp'),
+    aoMapIntensity : 1,
 	roughnessMap   : loader.load('Poly-cobblestone-wall/roughness_map.webp'),
-	roughness      : 1
+	roughness      : 1,
+    metalness      : 1
+})
+const sideGroundMaterial = new THREE.MeshStandardMaterial({
+    map              : wallMaterial.map.clone(),
+    normalMap        : wallMaterial.normalMap.clone(),
+    normalScale      : new THREE.Vector2(0.6, 0.6),
+    aoMapIntensity   : wallMaterial.aoMapIntensity,
+	roughnessMap     : wallMaterial.roughnessMap.clone(),
+	roughness        : wallMaterial.roughness,
+    metalness        : wallMaterial.metalness,
+    envMap           : scene.environment,
+})
+loader.load('Poly-cobblestone-wall/ao_map.jpg', (texture) => {
+    wallMaterial.aoMap = texture
+    wallMaterial.metalnessMap = texture
+    wallMaterial.needsUpdate = true
+
+    const sidegroundTexture = texture.clone()
+    sidegroundTexture.wrapS = sidegroundTexture.wrapT = THREE.RepeatWrapping
+    sidegroundTexture.repeat.set(mazeWidth, 20)
+    sidegroundTexture.rotation = Math.PI
+
+    sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
+    sideGroundMaterial.map.repeat.set(mazeWidth, 20)
+    sideGroundMaterial.map.rotation = Math.PI
+    sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
+    sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
+    sideGroundMaterial.normalMap.rotation = Math.PI
+    sideGroundMaterial.aoMap = sidegroundTexture
+    sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
+    sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
+    sideGroundMaterial.roughnessMap.rotation = Math.PI
+    sideGroundMaterial.metalnessMap = sidegroundTexture
+
+    sideGroundMaterial.needsUpdate = true
 })
 
 const maze = new MazeMesh(mazeWidth, mazeWidth, 1, wallMaterial)
 maze.castShadow = true
 maze.receiveShadow = true
 maze.matrixAutoUpdate = false
+
 scene.add(maze)
 
 console.log(String(maze))
@@ -202,7 +242,7 @@ function repeatGroundMaterial (texture) {
 }
 const groundMaterial = new THREE.MeshStandardMaterial({
     map         : loader.load('angled-blocks-vegetation/albedo.webp', repeatGroundMaterial),
-    aoMap       : loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
+    aoMap       : loader.load('angled-blocks-vegetation/ao.webp', repeatGroundMaterial),
     metalnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
     normalMap   : loader.load('angled-blocks-vegetation/normal-dx.webp', repeatGroundMaterial),
     roughnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
@@ -213,27 +253,6 @@ const groundMaterial = new THREE.MeshStandardMaterial({
         textureSampleCoefficientExponent: 32,
     }*/
 })
-
-const sideGroundMaterial = new THREE.MeshStandardMaterial({
-    map              : wallMaterial.map.clone(),
-    normalMap        : wallMaterial.normalMap.clone(),
-    normalScale      : new THREE.Vector2(0.6, 0.6),
-	aoMap            : wallMaterial.aoMap.clone(),
-	roughnessMap     : wallMaterial.roughnessMap.clone(),
-	roughness        : 1,
-})
-sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.map.repeat.set(mazeWidth, 20)
-sideGroundMaterial.map.rotation = Math.PI
-sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
-sideGroundMaterial.normalMap.rotation = Math.PI
-sideGroundMaterial.aoMap.wrapS = sideGroundMaterial.aoMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.aoMap.repeat.set(mazeWidth, 20)
-sideGroundMaterial.aoMap.rotation = Math.PI
-sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
-sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
-sideGroundMaterial.roughnessMap.rotation = Math.PI
 
 const ground = new THREE.Mesh(
     groundGeometry,
@@ -283,7 +302,6 @@ ocean.position.y = -0.2
 
 ocean.material.transparent = true
 ocean.material.onBeforeCompile = function (shader) {
-
     shader.uniforms.size = { value: 6 }
 
     shader.uniforms.waveA = {
@@ -312,7 +330,6 @@ ocean.material.onBeforeCompile = function (shader) {
     }
     shader.vertexShader = document.getElementById('vertexShader').textContent
     shader.fragmentShader = document.getElementById('fragmentShader').textContent
-
 }
 
 scene.add(ocean)
@@ -320,12 +337,12 @@ const oceanOctree  = new Octree().fromGraphNode(ocean)
 
 // Lights
 
-const sun = new THREE.Vector3()
+const sunPosition = new THREE.Vector3()
 
-const ambientLight = new THREE.AmbientLight(0x404040, 5)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambientLight)
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 1)
+const sunLight = new THREE.DirectionalLight(0xffffff, 3)
 sunLight.castShadow            = true
 sunLight.shadow.camera.near    = 0.1
 sunLight.shadow.camera.far     =  1.4 * mazeWidth
@@ -343,17 +360,15 @@ scene.add(sunLight)
 updateSun()
 
 function updateSun() {
-
     const phi = THREE.MathUtils.degToRad(90 - parameters.elevation)
     const theta = THREE.MathUtils.degToRad(parameters.azimuth)
 
-    sun.setFromSphericalCoords(1.4 * mazeWidth/2, phi, theta)
-    ocean.material.uniforms['sunDirection'].value.copy(sun).normalize()
+    sunPosition.setFromSphericalCoords(1.4 * mazeWidth/2, phi, theta)
+    ocean.material.uniforms['sunDirection'].value.copy(sunPosition).normalize()
     
-    sunLight.position.copy(sun)
+    sunLight.position.copy(sunPosition)
 
-    //ambientLight.intensity = 5 + 5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0))
-
+    ambientLight.intensity = 0.5 + 0.5 * Math.sin(Math.max(THREE.MathUtils.degToRad(parameters.elevation), 0))
 }
 
 // Raft
@@ -388,30 +403,28 @@ const raftOctree  = new Octree().fromGraphNode(raft)
 const stats = new Stats()
 
 if (dev) {
-    
     container.appendChild(stats.dom)
 
     const gui = new GUI()
 
-    const lightHelper = new THREE.DirectionalLightHelper(sunLight, .5)
+    /*const lightHelper = new THREE.DirectionalLightHelper(sunLight, .5)
     lightHelper.position.copy(maze.start)
-    lightHelper.visible = false
+    lightHelper.visible = false*/
 
     const octreeHelper = new OctreeHelper(mazeOctree)
     octreeHelper.visible = false
     scene.add(octreeHelper)
     const showHelper = gui.add({ helpers: false }, "helpers")
     showHelper.onChange(function (value) {
-
         lightHelper.visible = value
         octreeHelper.visible = value
-
     })
 
     const cameraFolder = gui.addFolder("camera")
     cameraFolder.add(camera, "focus",     0, 200).onChange(() => camera.updateProjectionMatrix())
     cameraFolder.add(camera, "fov",       0, 200).onChange(() => camera.updateProjectionMatrix())
     cameraFolder.add(camera, "filmGauge", 0, 200).onChange(() => camera.updateProjectionMatrix())
+    cameraFolder.close()
 
     const raftFolder = gui.addFolder("Raft")
     const raftPositionFolder = raftFolder.addFolder("position")
@@ -508,22 +521,31 @@ if (dev) {
         })
     waveCFolder.open()
 
-    const hexTilingFolder = gui.addFolder('Hex Tiling')
-    if (wallMaterial?.hexTiling?.patchScale) {
-        const wallMaterialFolder = hexTilingFolder.addFolder("wall")
-        wallMaterialFolder.add(wallMaterial.hexTiling, "patchScale", 0, 10)
-        wallMaterialFolder.add(wallMaterial.hexTiling, "useContrastCorrectedBlending")
-        wallMaterialFolder.add(wallMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
-        wallMaterialFolder.add(wallMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
+    const wallMaterialFolder = gui.addFolder("wallMaterial")
+    wallMaterialFolder.add(wallMaterial, "roughness").min(0).max(1)
+    wallMaterialFolder.add(wallMaterial, "metalness").min(0).max(1)
+    wallMaterialFolder.add(wallMaterial, "aoMapIntensity").min(-10).max(10)
+    wallMaterialFolder.add(wallMaterial, "bumpScale").min(-10).max(10).onChange(() => wallMaterial.needsUpdate = true)
+    wallMaterialFolder.close()
+
+    if (wallMaterial?.hexTiling) {
+        const hexTilingFolder = gui.addFolder('Hex Tiling')
+        if (wallMaterial?.hexTiling?.patchScale) {
+            const wallMaterialFolder = hexTilingFolder.addFolder("wall")
+            wallMaterialFolder.add(wallMaterial.hexTiling, "patchScale", 0, 10)
+            wallMaterialFolder.add(wallMaterial.hexTiling, "useContrastCorrectedBlending")
+            wallMaterialFolder.add(wallMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
+            wallMaterialFolder.add(wallMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
+        }
+        if (groundMaterial?.hexTiling?.patchScale) {
+            const groundMaterialFolder = hexTilingFolder.addFolder("ground")
+            groundMaterialFolder.add(groundMaterial.hexTiling, "patchScale", 0, 10)
+            groundMaterialFolder.add(groundMaterial.hexTiling, "useContrastCorrectedBlending")
+            groundMaterialFolder.add(groundMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
+            groundMaterialFolder.add(groundMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
+        }
+        hexTilingFolder.close()
     }
-    if (groundMaterial?.hexTiling?.patchScale) {
-        const groundMaterialFolder = hexTilingFolder.addFolder("ground")
-        groundMaterialFolder.add(groundMaterial.hexTiling, "patchScale", 0, 10)
-        groundMaterialFolder.add(groundMaterial.hexTiling, "useContrastCorrectedBlending")
-        groundMaterialFolder.add(groundMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
-        groundMaterialFolder.add(groundMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
-    }
-    hexTilingFolder.close()
 }
 
 //
@@ -552,15 +574,25 @@ let escaped = false
 const pointerLockControls = new PointerLockControls(camera, document.body)
 pointerLockControls.pointerSpeed = 0.7
 
+const keys = [
+    "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+    "KeyW", "KeyS", "KeyA", "KeyD", "Space"
+]
 const keyStates = {}
 
 document.addEventListener('keydown', (event) => {
-    keyStates[event.code] = true
+    if (keys.includes(event.code)) {
+        event.preventDefault()
+        keyStates[event.code] = true
+    }
 })
 
 document.addEventListener('keyup', (event) => {
-    keyStates[event.code] = false
-    if (event.code == 'Space') jumping = false
+    if (keys.includes(event.code)) {
+        event.preventDefault()
+        keyStates[event.code] = false
+        if (event.code == 'Space') jumping = false
+    }
 })
 
 let mouseButtonsStates = []
@@ -587,10 +619,9 @@ pointerLockControls.addEventListener('unlock', function () {
     document.removeEventListener('mouseup', onMouseChange)
 })
 
-scene.add(pointerLockControls.getObject())
+scene.add(pointerLockControls.object)
 
 function playerCollisions() {
-
     const playerOnMaze  = mazeOctree.capsuleIntersect(playerCollider)
     const playerOnRaft  = raftOctree.capsuleIntersect(playerCollider)
     const playerOnWater = oceanOctree.capsuleIntersect(playerCollider)
@@ -618,11 +649,9 @@ function playerCollisions() {
             camera.position.y = ocean.position.y + waveInfo.position.y + 0.2
         }
     }
-
 }
 
 function gameEnd() {
-
     escaped = true
     message.innerHTML = '<h2>Libre !</h2><a href="">Rejouer</a>'
     message.className = "escaped"
@@ -630,11 +659,9 @@ function gameEnd() {
 
     document.exitPointerLock()
     //container.style.cursor = "default"
-
 }
 
 function updatePlayer(deltaTime) {
-
     let damping = Math.exp(- 4 * deltaTime) - 1
 
     if (!playerOnFloor) {
@@ -650,32 +677,26 @@ function updatePlayer(deltaTime) {
     camera.position.copy(playerCollider.end)
 
     playerCollisions()
-
 }
 
 function getForwardVector() {
-
     camera.getWorldDirection(playerDirection)
     playerDirection.y = 0
     playerDirection.normalize()
 
     return playerDirection
-
 }
 
 function getSideVector() {
-
     camera.getWorldDirection(playerDirection)
     playerDirection.y = 0
     playerDirection.normalize()
     playerDirection.cross(camera.up)
 
     return playerDirection
-
 }
 
 function controls(deltaTime) {
-
     // gives a bit of air control
     const speedDelta = deltaTime * (playerOnFloor ? 100 : 20) / STEPS_PER_FRAME
 
@@ -700,7 +721,6 @@ function controls(deltaTime) {
 }
 
 function getWaveInfo(x, z, time) {
-
     const pos = new THREE.Vector3()
     const tangent = new THREE.Vector3(1, 0, 0)
     const binormal = new THREE.Vector3(0, 0, 1)
@@ -731,11 +751,9 @@ function getWaveInfo(x, z, time) {
     const normal = binormal.cross(tangent).normalize()
 
     return { position: pos, normal: normal }
-
 }
 
 function updateRaft(delta) {
-
     const t = ocean.material.uniforms['time'].value
 
     const waveInfo = getWaveInfo(raft.position.x, raft.position.z, t)
@@ -744,22 +762,18 @@ function updateRaft(delta) {
         new THREE.Euler().setFromVector3(waveInfo.normal)
     )
     raft.quaternion.rotateTowards(quat, delta * 0.5)
-
 }
 
 window.addEventListener('resize', onWindowResize)
 
 function onWindowResize() {
-
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
 
     renderer.setSize(window.innerWidth, window.innerHeight)
-
 }
 
 function animate() {
-
     const delta = Math.min(0.05, clock.getDelta())
     const deltaTime = delta / STEPS_PER_FRAME
 
@@ -771,7 +785,6 @@ function animate() {
     // an object traversing another too quickly for detection.
 
     for (let i = 0; i < STEPS_PER_FRAME; i++) {
-
         controls(deltaTime)
 
         updatePlayer(deltaTime)
@@ -784,5 +797,4 @@ function animate() {
     renderer.render(scene, camera)
 
     if (dev) stats.update()
-
 }

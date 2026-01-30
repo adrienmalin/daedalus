@@ -19,6 +19,12 @@ body {
   margin-bottom: 0.5em;
 }
 
+.keysTable {
+  display: inline-table;
+  vertical-align: middle;
+  text-align: center;
+}
+
 @keyframes perspective {
   from {
     transform: rotateX(0deg) perspective(0px);
@@ -38,6 +44,8 @@ body {
   margin-top: 20vh;
   margin-bottom: 5vh;
   animation: perspective 30s;
+  transform: rotateX(40deg) perspective(150px);
+  filter: drop-shadow(0px 10px 0px #0f2437);
 }
 
 @keyframes rotation {
