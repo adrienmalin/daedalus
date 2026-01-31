@@ -116,8 +116,8 @@ class Sprite {
 class Cannon extends Sprite {
     constructor(canvasCtx, note) {
         let sharp = [1, 3, 6, 8, 10].includes(note % 12)
-        //super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 418:424, 11, 26, 4)
-        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, 454 - 20*(note % 3), 11, 26, 4)
+        // super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, sharp? 418:444, 11, 26, 4)
+        super(canvasCtx, "cannon.png", 34 * (note - FIRST_NOTE) + 66, 454 - 20 * (note % 3), 11, 26, 4)
         this.note = note
         this.key = keyMap[note - FIRST_NOTE]?.toUpperCase() || ""
         this.impactHeight = 9
@@ -388,7 +388,7 @@ midiSelect.onfocus = function() {
                     midiSelect.add(option)
                     input.onmidimessage = null
                 }
-                if(midiIputs[midiKeyboard]) midiSelect.value = midiKeyboard
+                if (midiIputs[midiKeyboard]) midiSelect.value = midiKeyboard
             }
         },
         error => {
