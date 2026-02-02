@@ -5,7 +5,6 @@ import { Water } from 'three/addons/objects/Water.js'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js'
-import { CSM } from 'three/addons/csm/CSM.js';
 import Stats from 'three/addons/libs/stats.module.js'
 
 import MazeMesh from './MazeMesh.js'
@@ -184,26 +183,27 @@ const sideGroundMaterial = new THREE.MeshStandardMaterial({
 	roughness        : wallMaterial.roughness,
     metalness        : wallMaterial.metalness,
 })
-loader.load('Poly-cobblestone-wall/ao_map.jpg', (texture) => {
-    wallMaterial.aoMap = texture
-    wallMaterial.metalnessMap = texture
-    wallMaterial.needsUpdate = true
+sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.map.repeat.set(mazeWidth, 20)
+sideGroundMaterial.map.rotation = Math.PI
+sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
+sideGroundMaterial.normalMap.rotation = Math.PI
+sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
+sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
+sideGroundMaterial.roughnessMap.rotation = Math.PI
 
-    const sidegroundTexture = texture.clone()
+loader.load('Poly-cobblestone-wall/ao_map.jpg', (texture) => {
+    wallMaterial.aoMap        = texture
+    wallMaterial.metalnessMap = texture
+    wallMaterial.needsUpdate  = true
+
+    const sidegroundTexture       = texture.clone()
     sidegroundTexture.wrapS = sidegroundTexture.wrapT = THREE.RepeatWrapping
     sidegroundTexture.repeat.set(mazeWidth, 20)
     sidegroundTexture.rotation = Math.PI
 
-    sideGroundMaterial.map.wrapS = sideGroundMaterial.map.wrapT = THREE.RepeatWrapping
-    sideGroundMaterial.map.repeat.set(mazeWidth, 20)
-    sideGroundMaterial.map.rotation = Math.PI
-    sideGroundMaterial.normalMap.wrapS = sideGroundMaterial.normalMap.wrapT = THREE.RepeatWrapping
-    sideGroundMaterial.normalMap.repeat.set(mazeWidth, 20)
-    sideGroundMaterial.normalMap.rotation = Math.PI
-    sideGroundMaterial.aoMap = sidegroundTexture
-    sideGroundMaterial.roughnessMap.wrapS = sideGroundMaterial.roughnessMap.wrapT = THREE.RepeatWrapping
-    sideGroundMaterial.roughnessMap.repeat.set(mazeWidth, 20)
-    sideGroundMaterial.roughnessMap.rotation = Math.PI
+    sideGroundMaterial.aoMap        = sidegroundTexture
     sideGroundMaterial.metalnessMap = sidegroundTexture
 
     sideGroundMaterial.needsUpdate = true
@@ -246,13 +246,7 @@ const groundMaterial = new THREE.MeshStandardMaterial({
     aoMap       : loader.load('angled-blocks-vegetation/ao.webp', repeatGroundMaterial),
     metalnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
     normalMap   : loader.load('angled-blocks-vegetation/normal-dx.webp', repeatGroundMaterial),
-    roughnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial),
-    /*hexTiling   : {
-        patchScale: 1,
-        useContrastCorrectedBlending: true,
-        lookupSkipThreshold: 0.01,
-        textureSampleCoefficientExponent: 32,
-    }*/
+    roughnessMap: loader.load('angled-blocks-vegetation/ao-roughness-metalness.webp', repeatGroundMaterial)
 })
 
 const ground = new THREE.Mesh(
@@ -296,7 +290,7 @@ const ocean = new Water(waterGeometry, {
     waterColor     : 0x001e0f,
     distortionScale: 3.7,
     fog            : scene.fog !== undefined,
-    alpha          : 0.7
+    alpha          : 0.9
 })
 ocean.rotation.x = - Math.PI / 2
 ocean.position.y = -0.2
@@ -526,27 +520,9 @@ if (dev) {
     wallMaterialFolder.add(wallMaterial, "roughness").min(0).max(1)
     wallMaterialFolder.add(wallMaterial, "metalness").min(0).max(1)
     wallMaterialFolder.add(wallMaterial, "aoMapIntensity").min(-10).max(10)
-    wallMaterialFolder.add(wallMaterial, "bumpScale").min(-10).max(10).onChange(() => wallMaterial.needsUpdate = true)
+    wallMaterialFolder.add(wallMaterial.normalScale, "x")
+    wallMaterialFolder.add(wallMaterial.normalScale, "y")
     wallMaterialFolder.close()
-
-    if (wallMaterial?.hexTiling) {
-        const hexTilingFolder = gui.addFolder('Hex Tiling')
-        if (wallMaterial?.hexTiling?.patchScale) {
-            const wallMaterialFolder = hexTilingFolder.addFolder("wall")
-            wallMaterialFolder.add(wallMaterial.hexTiling, "patchScale", 0, 10)
-            wallMaterialFolder.add(wallMaterial.hexTiling, "useContrastCorrectedBlending")
-            wallMaterialFolder.add(wallMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
-            wallMaterialFolder.add(wallMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
-        }
-        if (groundMaterial?.hexTiling?.patchScale) {
-            const groundMaterialFolder = hexTilingFolder.addFolder("ground")
-            groundMaterialFolder.add(groundMaterial.hexTiling, "patchScale", 0, 10)
-            groundMaterialFolder.add(groundMaterial.hexTiling, "useContrastCorrectedBlending")
-            groundMaterialFolder.add(groundMaterial.hexTiling, "lookupSkipThreshold", 0, 1)
-            groundMaterialFolder.add(groundMaterial.hexTiling, "textureSampleCoefficientExponent", 0, 64).name("SampleCoefExp")
-        }
-        hexTilingFolder.close()
-    }
 }
 
 //
